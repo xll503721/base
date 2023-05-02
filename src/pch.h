@@ -9,6 +9,11 @@
 #include <vector>
 #include <functional>
 #include <sstream>
+#include <unordered_map>
+
+#define BASE_STORAGE_MEMORY base_storage_memory
+#define BEGIN_NAMESPACE_BASE_STORAGE_MEMORY BEGIN_NAMESPACE(BASE_STORAGE_MEMORY)
+#define END_NAMESPACE_BASE_STORAGE_MEMORY END_NAMESPACE()
 
 #define BASE_STRING base_string
 #define BEGIN_NAMESPACE_BASE_STRING BEGIN_NAMESPACE(BASE_STRING)
