@@ -1,6 +1,7 @@
 #ifndef LB_BASE_STORAGE_MEMORY_PCH_H
 #define LB_BASE_STORAGE_MEMORY_PCH_H
 
+#include "../../pch.h"
 
 BEGIN_NAMESPACE_BASE_STORAGE_MEMORY
 
@@ -12,8 +13,16 @@ public:
         return map_[key];
     }
     
+    bool Remove(const K& key)  {
+        if (map_.find(key) != map_.end()) {
+            map_.erase(key);
+            return true;
+        }
+        return false;
+    }
+    
 private:
-    std::unordered_map<K, V> map_;
+    std::map<K, V> map_;
 };
 
 END_NAMESPACE_BASE_STORAGE_MEMORY
