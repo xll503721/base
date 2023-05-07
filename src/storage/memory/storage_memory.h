@@ -10,6 +10,9 @@ class StorageMemory {
     
 public:
     V& operator[](const K& key) {
+        if (map_.find(key) == map_.end()) {
+            return nullptr;
+        }
         return map_[key];
     }
     

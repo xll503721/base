@@ -27,9 +27,11 @@ file(GLOB
      *.h)
 
 include_directories(./)
+include_directories(../thirdparty)
 
 add_subdirectory(storage/memory)
 add_subdirectory(string)
+add_subdirectory(./../thirdparty/jansson jansson)
 
 add_library(${PROJECT_NAME} SHARED ${base_source_h} ${base_source_cc})
 add_dependencies(${PROJECT_NAME} 
@@ -38,7 +40,8 @@ add_dependencies(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} 
                          ${BASE_STRING_LIB} 
-                         ${BASE_STORAGE_MEMORY_LIB})
+                         ${BASE_STORAGE_MEMORY_LIB}
+                         jansson)
 
 apple_framework_generate(${PROJECT_NAME} ${BASE_BUNDLE_ID} ${PROJECT_NAME} "")
 set_xcode_property(${PROJECT_NAME} PUBLIC_HEADER "${base_source_h}")
