@@ -10,6 +10,16 @@
 #include <functional>
 #include <sstream>
 #include <unordered_map>
+#include <thread>
+#include <condition_variable>
+
+#define BASE_THREAD base_thread
+#define BEGIN_NAMESPACE_BASE_THREAD BEGIN_NAMESPACE(BASE_THREAD)
+#define END_NAMESPACE_BASE_THREAD END_NAMESPACE()
+
+#define BASE_JSON base_json
+#define BEGIN_NAMESPACE_BASE_JSON BEGIN_NAMESPACE(BASE_JSON)
+#define END_NAMESPACE_BASE_JSON END_NAMESPACE()
 
 #define BASE_STORAGE_MEMORY base_storage_memory
 #define BEGIN_NAMESPACE_BASE_STORAGE_MEMORY BEGIN_NAMESPACE(BASE_STORAGE_MEMORY)

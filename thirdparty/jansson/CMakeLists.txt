@@ -12,7 +12,7 @@ if (MSVC)
 	option(JANSSON_STATIC_CRT "Link the static CRT libraries" OFF )
 endif ()
 
-option(JANSSON_EXAMPLES "Compile example applications" ON)
+option(JANSSON_EXAMPLES "Compile example applications" OFF)
 
 if (UNIX)
    option(JANSSON_COVERAGE "(GCC Only! Requires gcov/lcov to be installed). Include target for doing coverage analysis for the test suite. Note that -DCMAKE_BUILD_TYPE=Debug must be set" OFF)
@@ -364,7 +364,7 @@ if (JANSSON_EXAMPLES)
 endif()
 
 # For building Documentation (uses Sphinx)
-option(JANSSON_BUILD_DOCS "Build documentation (uses python-sphinx)." ON)
+option(JANSSON_BUILD_DOCS "Build documentation (uses python-sphinx)." OFF)
 if (JANSSON_BUILD_DOCS)
    find_package(Sphinx)
 
@@ -450,7 +450,7 @@ if (JANSSON_BUILD_DOCS)
 endif ()
 
 
-option(JANSSON_WITHOUT_TESTS "Don't build tests ('make test' to execute tests)" OFF)
+option(JANSSON_WITHOUT_TESTS "Don't build tests ('make test' to execute tests)" ON)
 
 if (NOT JANSSON_WITHOUT_TESTS)
    option(JANSSON_TEST_WITH_VALGRIND "Enable valgrind tests." OFF)
@@ -479,29 +479,29 @@ if (NOT JANSSON_WITHOUT_TESTS)
       add_definitions(-Wall -Wextra -Wdeclaration-after-statement)
    endif ()
 
-   set(api_tests
-         test_array
-         test_chaos
-         test_copy
-         test_dump
-         test_dump_callback
-         test_equal
-         test_fixed_size
-         test_load
-         test_load_callback
-         test_loadb
-         test_number
-         test_object
-         test_pack
-         test_simple
-         test_sprintf
-         test_unpack)
+   # set(api_tests
+   #       test_array
+   #       test_chaos
+   #       test_copy
+   #       test_dump
+   #       test_dump_callback
+   #       test_equal
+   #       test_fixed_size
+   #       test_load
+   #       test_load_callback
+   #       test_loadb
+   #       test_number
+   #       test_object
+   #       test_pack
+   #       test_simple
+   #       test_sprintf
+   #       test_unpack)
 
    # Doing arithmetic on void pointers is not allowed by Microsofts compiler
    # such as secure_malloc and secure_free is doing, so exclude it for now.
-   if (NOT MSVC)
-      list(APPEND api_tests test_memory_funcs)
-   endif()
+   # if (NOT MSVC)
+   #    list(APPEND api_tests test_memory_funcs)
+   # endif()
 
    # Helper macro for building and linking a test program.
    macro(build_testprog name dir)
