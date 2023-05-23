@@ -12,6 +12,16 @@
 #include <unordered_map>
 #include <thread>
 #include <condition_variable>
+#include <sstream>
+#include <pthread.h>
+
+#define BASE_LOG base_log
+#define BEGIN_NAMESPACE_BASE_LOG BEGIN_NAMESPACE(BASE_LOG)
+#define END_NAMESPACE_BASE_LOG END_NAMESPACE()
+
+#define BASE_MMAP base_mmap
+#define BEGIN_NAMESPACE_BASE_MMAP BEGIN_NAMESPACE(BASE_MMAP)
+#define END_NAMESPACE_BASE_MMAP END_NAMESPACE()
 
 #define BASE_THREAD base_thread
 #define BEGIN_NAMESPACE_BASE_THREAD BEGIN_NAMESPACE(BASE_THREAD)

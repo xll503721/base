@@ -9,9 +9,8 @@
 
 BEGIN_NAMESPACE_BASE_THREAD
 
-Thread::Thread(std::function<void(void)> func) {
+Thread::Thread(ThreadFunc func): func_(func) {
     run_loop_ = std::make_shared<RunLoop>();
-    std::thread inner_thread(func);
 }
 
 std::shared_ptr<RunLoop> Thread::GetCurrentRunLoop() {
@@ -20,6 +19,10 @@ std::shared_ptr<RunLoop> Thread::GetCurrentRunLoop() {
 
 std::thread::id Thread::GetId() {
     
+}
+
+void Thread::Start() {
+    std::thread thread(func_);
 }
 
 END_NAMESPACE_BASE_THREAD

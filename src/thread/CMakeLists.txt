@@ -1,4 +1,4 @@
-project(${BASE_STORAGE_THREAD})
+project(${BASE_THREAD})
 
 file(GLOB
      base_thread_source

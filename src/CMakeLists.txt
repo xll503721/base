@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.24)
 
 project(Base)
 
+set(CMAKE_CXX_STANDARD 17)
 set(BASE_NAME_LOWER_CASE "base")
 set(BASE_NAME_UPPER_CASE "Base")
 set(BASE_BUNDLE_ID_PREFIX "cn.gz.ch")
@@ -15,11 +16,17 @@ string(CONCAT BASE_STORAGE_MEMORY_LIB ${BASE_NAME_LOWER_CASE} "_storage_memory")
 set(BASE_STORAGE_DATABASE_LIB "")
 string(CONCAT BASE_STORAGE_DATABASE_LIB ${BASE_NAME_LOWER_CASE} "_storage_database")
 
-set(BASE_STORAGE_JSON "")
-string(CONCAT BASE_STORAGE_JSON ${BASE_NAME_LOWER_CASE} "_json")
+set(BASE_JSON "")
+string(CONCAT BASE_JSON ${BASE_NAME_LOWER_CASE} "_json")
 
-set(BASE_STORAGE_THREAD "")
-string(CONCAT BASE_STORAGE_THREAD ${BASE_NAME_LOWER_CASE} "_thread")
+set(BASE_THREAD "")
+string(CONCAT BASE_THREAD ${BASE_NAME_LOWER_CASE} "_thread")
+
+set(BASE_MMAP "")
+string(CONCAT BASE_MMAP ${BASE_NAME_LOWER_CASE} "_mmap")
+
+set(BASE_LOG "")
+string(CONCAT BASE_LOG ${BASE_NAME_LOWER_CASE} "_log")
 
 set(BASE_BUNDLE_ID "")
 string(CONCAT BASE_BUNDLE_ID ${BASE_BUNDLE_ID_PREFIX} ".base")
@@ -50,6 +57,8 @@ add_subdirectory(storage/memory)
 add_subdirectory(string)
 add_subdirectory(json)
 add_subdirectory(thread)
+add_subdirectory(mmap)
+add_subdirectory(log)
 #thirdparty
 add_subdirectory(./../thirdparty/jansson jansson)
 
@@ -57,16 +66,20 @@ add_library(${PROJECT_NAME} SHARED ${base_source_h} ${base_source_cc})
 add_dependencies(${PROJECT_NAME} 
                     ${BASE_STRING_LIB} 
                     ${BASE_STORAGE_MEMORY_LIB}
-                    ${BASE_STORAGE_JSON}
-                    ${BASE_STORAGE_THREAD}
+                    ${BASE_JSON}
+                    ${BASE_THREAD}
+                    ${BASE_MMAP}
+                    ${BASE_LOG}
                     jansson)
                     
 
 target_link_libraries(${PROJECT_NAME} 
                          ${BASE_STRING_LIB} 
                          ${BASE_STORAGE_MEMORY_LIB}
-                         ${BASE_STORAGE_JSON}
-                         ${BASE_STORAGE_THREAD}
+                         ${BASE_JSON}
+                         ${BASE_THREAD}
+                         ${BASE_MMAP}
+                         ${BASE_LOG}
                          jansson)
 
 apple_framework_generate(${PROJECT_NAME} ${BASE_BUNDLE_ID} ${PROJECT_NAME} "")
@@ -74,8 +87,10 @@ set_xcode_property(${PROJECT_NAME} PUBLIC_HEADER "${base_source_h}")
 
 set_target_folder_if_exist(${BASE_STRING_LIB} ${PROJECT_NAME})
 set_target_folder_if_exist(${BASE_STORAGE_MEMORY_LIB} ${PROJECT_NAME})
-set_target_folder_if_exist(${BASE_STORAGE_JSON} ${PROJECT_NAME})
-set_target_folder_if_exist(${BASE_STORAGE_THREAD} ${PROJECT_NAME})
+set_target_folder_if_exist(${BASE_JSON} ${PROJECT_NAME})
+set_target_folder_if_exist(${BASE_THREAD} ${PROJECT_NAME})
+set_target_folder_if_exist(${BASE_MMAP} ${PROJECT_NAME})
+set_target_folder_if_exist(${BASE_LOG} ${PROJECT_NAME})
 
 if(${CMAKE_VERSION} VERSION_GREATER "3.16.0")
     target_precompile_headers(${PROJECT_NAME} PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:${BASE_ROOT}/pch.h>")

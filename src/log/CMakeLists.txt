@@ -1,13 +1,11 @@
-project(${BASE_JSON})
+project(${BASE_LOG})
 
 file(GLOB
-     base_json_source
+     base_log_source
      *.cc
      *.h)
 
-include_directories(../../thirdparty/jansson/src)
-
-add_library(${PROJECT_NAME} STATIC ${base_json_source})
+add_library(${PROJECT_NAME} STATIC ${base_log_source})
 
 if(${CMAKE_VERSION} VERSION_GREATER "3.16.0")
     target_precompile_headers(${PROJECT_NAME} PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:${BASE_ROOT}/pch.h>")
