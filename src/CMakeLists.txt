@@ -7,6 +7,9 @@ set(BASE_NAME_LOWER_CASE "base")
 set(BASE_NAME_UPPER_CASE "Base")
 set(BASE_BUNDLE_ID_PREFIX "cn.gz.ch")
 
+set(BASE_BUNDLE_ID "")
+string(CONCAT BASE_BUNDLE_ID ${BASE_BUNDLE_ID_PREFIX} ".base")
+
 set(BASE_STRING_LIB "")
 string(CONCAT BASE_STRING_LIB ${BASE_NAME_LOWER_CASE} "_string")
 
@@ -31,8 +34,8 @@ string(CONCAT BASE_LOG ${BASE_NAME_LOWER_CASE} "_log")
 set(BASE_DEVICE "")
 string(CONCAT BASE_DEVICE ${BASE_NAME_LOWER_CASE} "_device")
 
-set(BASE_BUNDLE_ID "")
-string(CONCAT BASE_BUNDLE_ID ${BASE_BUNDLE_ID_PREFIX} ".base")
+set(BASE_PLATFORM "")
+string(CONCAT BASE_PLATFORM ${BASE_NAME_LOWER_CASE} "_platform")
 
 file(GLOB
      base_source_cc
@@ -63,6 +66,7 @@ add_subdirectory(thread)
 add_subdirectory(mmap)
 add_subdirectory(log)
 add_subdirectory(device)
+add_subdirectory(platform)
 #thirdparty
 add_subdirectory(./../thirdparty/jansson jansson)
 
@@ -75,6 +79,7 @@ add_dependencies(${PROJECT_NAME}
                     ${BASE_MMAP}
                     ${BASE_LOG}
                     ${BASE_DEVICE}
+                    ${BASE_PLATFORM}
                     jansson)
                     
 
@@ -86,6 +91,7 @@ target_link_libraries(${PROJECT_NAME}
                          ${BASE_MMAP}
                          ${BASE_LOG}
                          ${BASE_DEVICE}
+                         ${BASE_PLATFORM}
                          jansson)
 
 apple_framework_generate(${PROJECT_NAME} ${BASE_BUNDLE_ID} ${PROJECT_NAME} "")
@@ -98,6 +104,7 @@ set_target_folder_if_exist(${BASE_THREAD} ${PROJECT_NAME})
 set_target_folder_if_exist(${BASE_MMAP} ${PROJECT_NAME})
 set_target_folder_if_exist(${BASE_LOG} ${PROJECT_NAME})
 set_target_folder_if_exist(${BASE_DEVICE} ${PROJECT_NAME})
+set_target_folder_if_exist(${BASE_PLATFORM} ${PROJECT_NAME})
 
 if(${CMAKE_VERSION} VERSION_GREATER "3.16.0")
     target_precompile_headers(${PROJECT_NAME} PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:${BASE_ROOT}/pch.h>")
