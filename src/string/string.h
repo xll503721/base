@@ -15,6 +15,7 @@ void RightTrim(std::string& s);
 void Trim(std::string& s);
 
 std::vector<std::string> Split(const std::string& target_str, const std::string& delim);
+std::string Join(const std::vector<std::string>& list, const std::string& separator);
 
 void ReplaceAll(std::string& str, const std::string& from, const std::string& to);
 

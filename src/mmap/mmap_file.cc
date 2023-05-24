@@ -26,7 +26,7 @@ MmapFile::~MmapFile() {
 bool MmapFile::Create(const std::string& path) {
     fd_ = open(path.c_str(), O_RDWR | O_CREAT | O_CLOEXEC, 0600);
     if (fd_ < 0) {
-        printf("open fd failed");
+        printf("open fd failed\n");
         return false;
     }
     

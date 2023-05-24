@@ -6,6 +6,7 @@
 //
 
 #include "log.h"
+#include <device/device.h>
 
 BEGIN_NAMESPACE_BASE_LOG
 
@@ -28,7 +29,10 @@ line_(line),
 func_(func),
 is_print_console_(is_print_console)
 {
-//    mmap_file_.Create("");
+    static std::once_flag token;
+    std::call_once(token, [=](){
+        mmap_file_.Create(BASE_DEVICE::OT_FILE.Caches());
+    });
 }
 
 void Log::Print(Level level,
@@ -36,14 +40,12 @@ void Log::Print(Level level,
                 int32_t line,
                 const std::string& func) {
     std::string content = Format(log_levels[static_cast<int32_t>(level)], src, line, func, oss_.str());
-//#if DEBUG
     if (is_print_console_) {
         printf("%s", content.c_str());
     }
     if (level == Level::kFault) {
 //        RESUMABLE_ASSERT_DEBUG_BREAK();
     }
-//#endif
     mmap_file_.Wirte(content, content.size());
 }
 

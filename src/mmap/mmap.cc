@@ -32,14 +32,14 @@ bool Mmap::Mapping(int fd) {
     if (file_size_ == 0 || (file_size_ / page_size) != 0) {
         mmap_size_ = (file_size_ / page_size + 1) * page_size;
         if (ftruncate(fd, mmap_size_) != 0) {
-            printf("ftruncate failed");
+            printf("ftruncate failed\n");
             return -1;
         }
     }
     
     data_ = (char *)mmap(nullptr, mmap_size_, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (data_ == MAP_FAILED) {
-        printf("mmap failed");
+        printf("mmap failed\n");
         return -1;
     }
     return 0;
@@ -47,7 +47,7 @@ bool Mmap::Mapping(int fd) {
 
 bool Mmap::Append(const int fd, const std::string& data, size_t len) {
     if (!data_) {
-        printf("append_mmap_data failed");
+        printf("append_mmap_data failed\n");
         return;
     }
     if (!CheckSize(len)) {
@@ -60,7 +60,7 @@ bool Mmap::Append(const int fd, const std::string& data, size_t len) {
 void Mmap::Close() {
     if (data_) {
         if (munmap(data_, file_size_) != 0) {
-            printf("close_res munmap failed");
+            printf("close_res munmap failed\n");
         }
         data_ = nullptr;
         file_size_ = 0;
@@ -79,17 +79,17 @@ bool Mmap::CheckSize(size_t len) {
 void Mmap::ExpandCapacity(const int fd) {
     off_t expand_capacity_size = mmap_size_ + getpagesize();
     if (ftruncate(fd, expand_capacity_size) != 0) {
-        printf("expand_capacity ftruncate failed");
+        printf("expand_capacity ftruncate failed\n");
         return;
     }
     if (munmap(data_, mmap_size_) != 0) {
-        printf("expand_capacity munmap failed");
+        printf("expand_capacity munmap failed\n");
         return;
     }
     mmap_size_ = expand_capacity_size;
     data_ = (char *)mmap(nullptr, mmap_size_, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (data_ == MAP_FAILED) {
-        printf("expand_capacity mmap failed");
+        printf("expand_capacity mmap failed\n");
         return;
     }
 }

@@ -66,4 +66,15 @@ std::vector<std::string> Split(const std::string& target_str, const std::string&
   return elems;
 }
 
+std::string Join(const std::vector<std::string>& list, const std::string& separator) {
+  std::stringstream ss;
+  for (size_t i = 0; i < list.size(); i++) {
+    ss << list[i];
+    if (i != list.size() - 1) {
+      ss << separator;
+    }
+  }
+  return ss.str();
+}
+
 END_NAMESPACE_BASE_STRING

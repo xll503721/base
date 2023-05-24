@@ -28,6 +28,9 @@ string(CONCAT BASE_MMAP ${BASE_NAME_LOWER_CASE} "_mmap")
 set(BASE_LOG "")
 string(CONCAT BASE_LOG ${BASE_NAME_LOWER_CASE} "_log")
 
+set(BASE_DEVICE "")
+string(CONCAT BASE_DEVICE ${BASE_NAME_LOWER_CASE} "_device")
+
 set(BASE_BUNDLE_ID "")
 string(CONCAT BASE_BUNDLE_ID ${BASE_BUNDLE_ID_PREFIX} ".base")
 
@@ -59,6 +62,7 @@ add_subdirectory(json)
 add_subdirectory(thread)
 add_subdirectory(mmap)
 add_subdirectory(log)
+add_subdirectory(device)
 #thirdparty
 add_subdirectory(./../thirdparty/jansson jansson)
 
@@ -70,6 +74,7 @@ add_dependencies(${PROJECT_NAME}
                     ${BASE_THREAD}
                     ${BASE_MMAP}
                     ${BASE_LOG}
+                    ${BASE_DEVICE}
                     jansson)
                     
 
@@ -80,6 +85,7 @@ target_link_libraries(${PROJECT_NAME}
                          ${BASE_THREAD}
                          ${BASE_MMAP}
                          ${BASE_LOG}
+                         ${BASE_DEVICE}
                          jansson)
 
 apple_framework_generate(${PROJECT_NAME} ${BASE_BUNDLE_ID} ${PROJECT_NAME} "")
@@ -91,6 +97,7 @@ set_target_folder_if_exist(${BASE_JSON} ${PROJECT_NAME})
 set_target_folder_if_exist(${BASE_THREAD} ${PROJECT_NAME})
 set_target_folder_if_exist(${BASE_MMAP} ${PROJECT_NAME})
 set_target_folder_if_exist(${BASE_LOG} ${PROJECT_NAME})
+set_target_folder_if_exist(${BASE_DEVICE} ${PROJECT_NAME})
 
 if(${CMAKE_VERSION} VERSION_GREATER "3.16.0")
     target_precompile_headers(${PROJECT_NAME} PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:${BASE_ROOT}/pch.h>")
