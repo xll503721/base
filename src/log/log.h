@@ -8,6 +8,8 @@
 #define otlog_info otlog_xxx(BASE_LOG::Log::Level::kInfo)
 #define otlog_fault otlog_xxx(BASE_LOG::Log::Level::kFault)
 
+BEGIN_NAMESPACE_BASE_LOG
+
 #if __i386__ || __x86_64__
 #define RESUMABLE_ASSERT_DEBUG_BREAK() asm("int3")
 #elif __arm__
@@ -31,8 +33,6 @@
 #else
 #error "Unsupported architecture."
 #endif  // __i386__ || __x86_64__
-
-BEGIN_NAMESPACE_BASE_LOG
 
 class Log {
     
@@ -69,6 +69,8 @@ private:
                        const std::string& func,
                        const std::string& content);
     
+    static void MmapPrint(const std::string& content);
+    
 private:
     std::ostringstream oss_;
     
@@ -77,8 +79,6 @@ private:
     std::string src_;
     int32_t line_;
     std::string func_;
-    
-    BASE_MMAP::MmapFile mmap_file_;
 };
 
 END_NAMESPACE_BASE_LOG

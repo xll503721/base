@@ -19,6 +19,8 @@ std::string Join(const std::vector<std::string>& list, const std::string& separa
 
 void ReplaceAll(std::string& str, const std::string& from, const std::string& to);
 
+bool StartsWith(const std::string& target_str, const std::string& prefix);
+
 END_NAMESPACE_BASE_STRING
 
 #endif /* LB_BASE_STRING_PCH_H */

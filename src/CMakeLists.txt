@@ -45,6 +45,14 @@ file(GLOB
      base_source_h
      *.h)
 
+if(OSX OR IOS)
+    file(GLOB
+         base_source_mm
+         *.mm
+         *m)
+    list(APPEND base_source_cc ${base_source_mm})
+ endif()
+
 if(IOS)
     set(PLATFORM iOS)
     add_definitions(-D OS_IOS)
@@ -70,6 +78,12 @@ add_subdirectory(platform)
 #thirdparty
 add_subdirectory(./../thirdparty/jansson jansson)
 
+find_library(UIKIT UIKit)
+find_library(FOUNDATION Foundation)
+find_library(MOBILECORESERVICES MobileCoreServices)
+find_library(CFNETWORK CFNetwork)
+find_library(SYSTEMCONFIGURATION SystemConfiguration)
+
 add_library(${PROJECT_NAME} SHARED ${base_source_h} ${base_source_cc})
 add_dependencies(${PROJECT_NAME} 
                     ${BASE_STRING_LIB} 
@@ -92,6 +106,8 @@ target_link_libraries(${PROJECT_NAME}
                          ${BASE_LOG}
                          ${BASE_DEVICE}
                          ${BASE_PLATFORM}
+                         ${UIKIT} 
+                         ${FOUNDATION}
                          jansson)
 
 apple_framework_generate(${PROJECT_NAME} ${BASE_BUNDLE_ID} ${PROJECT_NAME} "")

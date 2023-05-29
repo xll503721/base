@@ -2,31 +2,42 @@
 #define LB_BASE_DEVICE_PCH_H
 
 #include "../pch.h"
+#include <platform/platform.h>
 
 BEGIN_NAMESPACE_BASE_DEVICE
-
-#define OT_DEVICE Device::DefaultInstance()
-#define OT_FILE Device::DefaultInstance().GetFile()
 
 class Device {
     
 public:
-    class File {
+    class File: public std::enable_shared_from_this<File> {
         
     public:
         File() = default;
         
-        std::string Documents();
-        std::string Library();
-        std::string Caches();
+        std::string GetDocumentsPath();
+        std::string GetLibraryPath();
+        std::string GetCachesPath();
+        
+    private:
+        std::string documents_path_;
+        std::string library_path_;
+        std::string caches_path_;
+        
+        PLATFORM_GENERATE_NAME(OTFile)
     };
     
+    Device();
     static Device& DefaultInstance();
     
-    File& GetFile();
+    std::shared_ptr<File> GetFile();
+    std::string GetUniqueDeviceId();
+    std::string GetSystemVersion();
+    std::string GetDeviceModel();
     
 private:
-    File file_;
+    std::shared_ptr<File> file_;
+    std::string device_id_;
+    std::string system_version_;
 };
 
 END_NAMESPACE_BASE_DEVICE

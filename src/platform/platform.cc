@@ -8,6 +8,7 @@
 #include "platform.h"
 #include <string/string.h>
 #include <storage/memory/storage_memory.h>
+#include <log/log.h>
 
 BEGIN_NAMESPACE_BASE_PLATFORM
 
@@ -17,6 +18,7 @@ Platform::PlatformPerform Platform::perform_fun_ = nullptr;
 Platform::Platform(const std::string& class_name, std::shared_ptr<void> c_plus_plus_obj):
 platform_obj_(nullptr),
 c_plus_plus_obj_(c_plus_plus_obj) {
+    
 }
 
 bool Platform::isPlatform(PlatformType type) {
@@ -60,6 +62,10 @@ Platform::PlatformType Platform::platform() {
 #endif
 }
 
+Platform::Var Platform::GetVar(Var var) {
+    return var;
+}
+
 void Platform::SetInitMehtod(PlatformInit method) {
     init_fun_ = method;
 }
@@ -75,28 +81,30 @@ void Platform::Init(const std::string& file_name, const std::string& class_name,
     
     auto file_name_string = file_name;
     BASE_STRING::ReplaceAll(file_name_string, ".cc", "");
+    BASE_STRING::ReplaceAll(file_name_string, ".h", "");
     
     platform_obj_ = init_fun_(file_name_string, class_name, c_plus_plus_obj);
     if (!platform_obj_) {
-        
+        otlog_fault << "platform_obj create failed, check file_name_string:" << file_name_string << ", class_name:" << class_name << ", c_plus_plus_obj:" << c_plus_plus_obj;
     }
 }
 
-void* Platform::Perform(const std::string& file_name, const std::string& method_name, bool is_set_delegate, const std::string& params_name, BASE_PLATFORM::Platform::Var* params, ...) {
+std::shared_ptr<Platform::Var> Platform::Perform(const std::string& file_name, const std::string& method_name, bool is_set_delegate, const std::string& params_name, BASE_PLATFORM::Platform::Var* params, ...) {
     if (!platform_obj_) {
         return;
     }
 
     std::vector<BASE_PLATFORM::Platform::Var*> params_vector;
-    params_vector.push_back(params);
-    
-    va_list args;
-    va_start(args, params);
-    BASE_PLATFORM::Platform::Var* arg;
-    while ((arg = va_arg(args, BASE_PLATFORM::Platform::Var*))) {
-        params_vector.push_back((arg));
+    if (params) {
+        params_vector.push_back(params);
+        va_list args;
+        va_start(args, params);
+        BASE_PLATFORM::Platform::Var* arg;
+        while ((arg = va_arg(args, BASE_PLATFORM::Platform::Var*))) {
+            params_vector.push_back((arg));
+        }
+        va_end(args);
     }
-    va_end(args);
 
     auto params_name_string = params_name;
     BASE_STRING::ReplaceAll(params_name_string, "&", "");
@@ -107,13 +115,21 @@ void* Platform::Perform(const std::string& file_name, const std::string& method_
     BASE_STRING::ReplaceAll(file_name_string, ".cc", "");
     
     auto method_name_string = method_name;
+    std::string get("Get");
+    if (BASE_STRING::StartsWith(method_name_string, get)) {
+        method_name_string.erase(0, get.size());
+    }
     method_name_string[0] = tolower(method_name_string[0]);
+    
     std::string full_method_name_string = method_name_string;
     if (isPlatform(PlatformType::kPlatformTypeiOS)) {
-        full_method_name_string += "With";
         
         std::vector<std::string> upper_params_name_word;
         for (int i = 0; i < params_name_vector.size(); i++) {
+            if (i == 0) {
+                full_method_name_string += "With";
+            }
+            
             auto params_name = params_name_vector[i];
             std::vector<std::string> params_name_word = BASE_STRING::Split(params_name, "_");
             
@@ -122,6 +138,7 @@ void* Platform::Perform(const std::string& file_name, const std::string& method_
                 auto one_word = params_name_word[j];
                 if (i == 0 || j != 0) {
                     one_word[0] = std::toupper(one_word[0]);
+                    BASE_STRING::ReplaceAll(one_word, "Get", "");
                 }
                 full_params_name += one_word;
                 if (j == params_name_word.size() - 1) {

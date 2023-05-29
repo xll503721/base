@@ -14,6 +14,8 @@ static const char* log_levels[] {
     nullptr, "info", "fault", "error", nullptr,
 };
 
+static BASE_MMAP::MmapFile mmap_file_;
+
 Log::~Log() {
     Print(level_, src_, line_, func_);
 }
@@ -29,10 +31,6 @@ line_(line),
 func_(func),
 is_print_console_(is_print_console)
 {
-    static std::once_flag token;
-    std::call_once(token, [=](){
-        mmap_file_.Create(BASE_DEVICE::OT_FILE.Caches());
-    });
 }
 
 void Log::Print(Level level,
@@ -46,7 +44,7 @@ void Log::Print(Level level,
     if (level == Level::kFault) {
 //        RESUMABLE_ASSERT_DEBUG_BREAK();
     }
-    mmap_file_.Wirte(content, content.size());
+    Log::MmapPrint(content);
 }
 
 std::string Log::Format(const std::string& tag,
@@ -56,6 +54,15 @@ std::string Log::Format(const std::string& tag,
                    const std::string& content) {
     std::string all_log = tag + "|" + src + "|" + std::to_string(line) + "|" + func + "|" + content + "\n";
     return all_log;
+}
+
+void Log::MmapPrint(const std::string& content) {
+    static std::once_flag token;
+    std::call_once(token, [=](){
+        mmap_file_.Create(BASE_DEVICE::Device::DefaultInstance().GetFile()->GetCachesPath() + "/mmap.log");
+    });
+
+    mmap_file_.Wirte(content, content.size());
 }
 
 END_NAMESPACE_BASE_LOG
