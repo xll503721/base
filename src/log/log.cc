@@ -52,8 +52,15 @@ std::string Log::Format(const std::string& tag,
                    int32_t line,
                    const std::string& func,
                    const std::string& content) {
-    std::string all_log = tag + "|" + src + "|" + std::to_string(line) + "|" + func + "|" + content + "\n";
-    return all_log;
+    mach_port_t tid = pthread_mach_thread_np(pthread_self());
+    std::stringstream ss;
+    ss << tag + "|" + src + "|";
+    ss << tid;
+    ss << "|";
+    ss << line;
+    ss << "|";
+    ss << func + "|" + content + "\n";
+    return ss.str();
 }
 
 void Log::MmapPrint(const std::string& content) {

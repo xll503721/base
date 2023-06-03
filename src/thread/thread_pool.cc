@@ -30,16 +30,14 @@ ThreadPool::ThreadPool(int32_t thread_num) {
 }
 
 void ThreadPool::Execute() {
-    otlog_info << "thread id:";
-    std::lock_guard<std::mutex> lock(mutex_);
-    
     do {
+        otlog_info << "task queue size:" << std::to_string(task_queue_.size());
         std::unique_lock<std::mutex> lock(cv_mutex);
         cv_.wait(lock, [this] {
             return task_queue_.size() > 0;
         });
         
-        otlog_info << "thread id:" << " get task";
+        otlog_info << "execute task";
         auto func = task_queue_.front();
         func();
         task_queue_.pop();
@@ -48,15 +46,14 @@ void ThreadPool::Execute() {
 
 void ThreadPool::Schedule(Thread::Type type, Thread::ThreadFunc func) {
     if (type == Thread::Type::kMain) {
-        main_thread_->Start();
+        otlog_info << "add task to main thread";
+        main_thread_->Post(func);
         return;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
-    {
-        task_queue_.push(func);
-        std::unique_lock<std::mutex> lock(cv_mutex);
-        cv_.notify_all();
-    }
+    otlog_info << "add task in type:" << std::to_string(static_cast<int32_t>(type));
+    task_queue_.push(func);
+    std::unique_lock<std::mutex> lock(cv_mutex);
+    cv_.notify_all();
 }
 
 void ThreadPool::Terminate() {

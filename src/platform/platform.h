@@ -5,10 +5,11 @@
 //  Created by li zhixuan on 2023/4/9.
 //
 
-#include "../pch.h"
-
 #ifndef LB_BASE_PLATFORM_PCH_H
 #define LB_BASE_PLATFORM_PCH_H
+
+#include "../pch.h"
+#include <log/log.h>
 
 BEGIN_NAMESPACE_BASE_PLATFORM
 
@@ -113,22 +114,37 @@ public:
         }
         
         int32_t GetInt32() {
+            if (GetType() != Type::kTypeInt) {
+                otlog_fault << "type error";
+            }
             return value_.int32_;
         }
         
         int32_t GetBool() {
+            if (GetType() != Type::kTypeBool) {
+                otlog_fault << "type error";
+            }
             return value_.boolean_;
         }
         
         std::unordered_map<std::string, Var>* GetMap() {
+            if (GetType() != Type::kTypeMap) {
+                otlog_fault << "type error";
+            }
             return value_.map_;
         }
         
         std::string GetString() {
+            if (GetType() != Type::kTypeString) {
+                otlog_fault << "type error";
+            }
             return value_.c_;
         }
         
         void* GetPtr() {
+            if (GetType() != Type::kTypeVoid) {
+                otlog_fault << "type error";
+            }
             return value_.ptr_;
         }
         

@@ -8,7 +8,6 @@
 #include "platform.h"
 #include <string/string.h>
 #include <storage/memory/storage_memory.h>
-#include <log/log.h>
 
 BEGIN_NAMESPACE_BASE_PLATFORM
 
