@@ -47,7 +47,7 @@ std::string Device::File::GetLibraryPath() {
 std::string Device::File::GetCachesPath() {
     if (caches_path_.empty()) {
         PLATFORM_INVOKE()
-        caches_path_ = static_cast<char*>(GET_PLATFORM_INVOKE_RESULT->GetPtr());
+        caches_path_ = static_cast<char*>(GET_PLATFORM_INVOKE_RESULT);
     }
     return caches_path_;
 }

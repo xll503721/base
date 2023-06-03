@@ -24,6 +24,9 @@ std::shared_ptr<BASE_PLATFORM::Platform> GetPlatform() {\
     }\
     return platform_;\
 }\
+void* GetPlatformObj() {\
+    return platform_->GetPlatformObj();\
+}\
 
 #define SET_PLATFORM_GENERATE_NAME(PLATFORM_OBJ_NAME)\
 platform_obj_name_ = PLATFORM_OBJ_NAME;\
@@ -47,10 +50,10 @@ BASE_PLATFORM::Platform::GetVar(VALUE);
 #define PLATFORM_INVOKE(...) \
 std::string parmas_str = #__VA_ARGS__;\
 std::string file(__FILE_NAME__);\
-std::string func(__FUNCTION__);\
+std::string func(__PRETTY_FUNCTION__);\
 auto PLATFORM_INVOKE_RESULT = GetPlatform()->Perform(file, func, false, parmas_str, ##__VA_ARGS__, nullptr);\
 
-#define GET_PLATFORM_INVOKE_RESULT PLATFORM_INVOKE_RESULT
+#define GET_PLATFORM_INVOKE_RESULT PLATFORM_INVOKE_RESULT->GetPtr()
 
 class Platform {
     
@@ -159,7 +162,7 @@ public:
     using PlatformPerform = std::function<std::shared_ptr<Var> (const void* platform_obj, const std::string& file_name, const std::string& method_name, bool is_set_delegate, const std::vector<std::string>& params_name, const std::vector<Platform::Var*>& params)>;
     
     void Init(const std::string& file_name, const std::string& class_name, void* c_plus_plus_obj);
-    std::shared_ptr<Var> Perform(const std::string& file_name, const std::string& method_name, bool is_set_delegate, const std::string& params_name, Platform::Var* params, ...) __attribute__((sentinel(0,1)));
+    std::shared_ptr<Var> Perform(const std::string& file_name, const std::string& method_name_full, bool is_set_delegate, const std::string& params_name, Platform::Var* params, ...) __attribute__((sentinel(0,1)));
     
     static bool isPlatform(PlatformType type);
     static PlatformType platform();
@@ -168,6 +171,10 @@ public:
     static void SetPerformMehtod(PlatformPerform method);
     
     void* GetPlatformObj();
+    
+private:
+    bool ParseMethod(const std::string& method_name_full, std::string& retrun_type, std::string& only_method);
+    void ParseMethodStyleiOS(const std::vector<std::string>& params_name_vector, std::string& only_method);
     
 public:
     

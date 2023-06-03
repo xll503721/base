@@ -6,16 +6,24 @@
 //
 
 #include "run_loop.h"
+#include <platform/platform.h>
 
 BEGIN_NAMESPACE_BASE_THREAD
 
-void RunLoop::SetupPlatformRunLoop() {
+void RunLoop::SetupRunLoop() {
     
+}
+
+void RunLoop::SetupMainRunLoop() {
+    run_loop_.SetupMianRunLoop();
 }
 
 bool RunLoop::IsMain() {
-    
+    return run_loop_.IsMain();
 }
 
+void RunLoop::Post(std::function<void(void)> action) {
+    run_loop_.Post(action);
+}
 
 END_NAMESPACE_BASE_THREAD

@@ -89,9 +89,11 @@ void Platform::Init(const std::string& file_name, const std::string& class_name,
     }
 }
 
-std::shared_ptr<Platform::Var> Platform::Perform(const std::string& file_name, const std::string& method_name, bool is_set_delegate, const std::string& params_name, BASE_PLATFORM::Platform::Var* params, ...) {
+std::shared_ptr<Platform::Var> Platform::Perform(const std::string& file_name, const std::string& method_name_full, bool is_set_delegate, const std::string& params_name, BASE_PLATFORM::Platform::Var* params, ...) {
+    std::shared_ptr<Platform::Var> error_var;
+    
     if (!platform_obj_) {
-        return;
+        return error_var;
     }
 
     std::vector<BASE_PLATFORM::Platform::Var*> params_vector;
@@ -114,42 +116,75 @@ std::shared_ptr<Platform::Var> Platform::Perform(const std::string& file_name, c
     auto file_name_string = file_name;
     BASE_STRING::ReplaceAll(file_name_string, ".cc", "");
     
-    auto method_name_string = method_name;
-    std::string get("Get");
-    if (BASE_STRING::StartsWith(method_name_string, get)) {
-        method_name_string.erase(0, get.size());
+    std::string return_type;
+    std::string only_method;
+    if (!ParseMethod(method_name_full, return_type, only_method)) {
+        return error_var;
     }
-    method_name_string[0] = tolower(method_name_string[0]);
     
-    std::string full_method_name_string = method_name_string;
     if (isPlatform(PlatformType::kPlatformTypeiOS)) {
-        
-        std::vector<std::string> upper_params_name_word;
-        for (int i = 0; i < params_name_vector.size(); i++) {
-            if (i == 0) {
-                full_method_name_string += "With";
-            }
-            
-            auto params_name = params_name_vector[i];
-            std::vector<std::string> params_name_word = BASE_STRING::Split(params_name, "_");
-            
-            std::string full_params_name;
-            for (int j = 0; j < params_name_word.size(); j++) {
-                auto one_word = params_name_word[j];
-                if (i == 0 || j != 0) {
-                    one_word[0] = std::toupper(one_word[0]);
-                    BASE_STRING::ReplaceAll(one_word, "Get", "");
-                }
-                full_params_name += one_word;
-                if (j == params_name_word.size() - 1) {
-                    full_params_name += ":";
-                }
-            }
-            full_method_name_string += full_params_name;
-        }
+        ParseMethodStyleiOS(params_name_vector, only_method);
     }
     
-    return perform_fun_(platform_obj_, file_name_string, full_method_name_string, is_set_delegate, params_name_vector, params_vector);
+    return perform_fun_(platform_obj_, file_name_string, only_method, is_set_delegate, params_name_vector, params_vector);
+}
+
+void Platform::ParseMethodStyleiOS(const std::vector<std::string>& params_name_vector, std::string& only_method) {
+    std::vector<std::string> upper_params_name_word;
+    for (int i = 0; i < params_name_vector.size(); i++) {
+        if (i == 0) {
+            only_method += "With";
+        }
+        
+        auto params_name = params_name_vector[i];
+        std::vector<std::string> params_name_word = BASE_STRING::Split(params_name, "_");
+        
+        std::string full_params_name;
+        for (int j = 0; j < params_name_word.size(); j++) {
+            auto one_word = params_name_word[j];
+            if (i == 0 || j != 0) {
+                one_word[0] = std::toupper(one_word[0]);
+                BASE_STRING::ReplaceAll(one_word, "Get", "");
+            }
+            full_params_name += one_word;
+            if (j == params_name_word.size() - 1) {
+                full_params_name += ":";
+            }
+        }
+        only_method += full_params_name;
+    }
+}
+
+bool Platform::ParseMethod(const std::string& method_name_full, std::string& retrun_type, std::string& only_method) {
+    //parse mehtod
+    std::vector<std::string> method_name_full_vector = BASE_STRING::Split(method_name_full, " ");
+    if (method_name_full_vector.size() <= 1) {
+        otlog_fault << "check invoke method name";
+        return false;
+    }
+    //return type, such as 'std::string'
+    std::string return_type = method_name_full_vector[0];
+    //method_params, such as 'ot_base_device::Device::File::GetCachesPath()'
+    std::string method_params = method_name_full_vector[1];
+    size_t index = method_params.find("(");
+    if (index == std::string::npos) {
+        otlog_fault << "check invoke method name";
+        return false;
+    }
+    //method, such as ot_base_device::Device::File::GetCachesPath
+    std::string method = method_params.substr(0, index);
+    
+    std::string find_str(":");
+    size_t colon_index = method.rfind(find_str);
+    //method, such as GetCachesPath
+    only_method = method.substr(colon_index + find_str.size());
+    
+    std::string get("Get");
+    if (BASE_STRING::StartsWith(only_method, get)) {
+        only_method.erase(0, get.size());
+    }
+    only_method[0] = tolower(only_method[0]);
+    return true;
 }
 
 void* Platform::GetPlatformObj() {

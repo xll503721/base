@@ -7,6 +7,7 @@
 
 #include "thread_pool.h"
 #include "thread.h"
+#include <log/log.h>
 
 BEGIN_NAMESPACE_BASE_THREAD
 
@@ -16,17 +17,20 @@ ThreadPool &ThreadPool::DefaultPool() {
 }
 
 ThreadPool::ThreadPool(int32_t thread_num) {
-    main_thread_ = std::make_shared<Thread>();
+    main_thread_ = std::make_shared<Thread>(Thread::Type::kMain);
     std::lock_guard<std::mutex> lock(mutex_);
     
     thread_num_ = thread_num;
+    otlog_info << "create:" << thread_num_ << " count thread";
     for (int32_t i = 0; i < thread_num; i++) {
-        std::shared_ptr<Thread> thread = std::make_shared<Thread>();
+        std::shared_ptr<Thread> thread = std::make_shared<Thread>(std::bind(&ThreadPool::Execute, this), BASE_THREAD::Thread::Type::kOther);
         any_thread_map_[thread->GetId()] = thread;
+        thread->Start();
     }
 }
 
 void ThreadPool::Execute() {
+    otlog_info << "thread id:";
     std::lock_guard<std::mutex> lock(mutex_);
     
     do {
@@ -35,15 +39,18 @@ void ThreadPool::Execute() {
             return task_queue_.size() > 0;
         });
         
+        otlog_info << "thread id:" << " get task";
         auto func = task_queue_.front();
         func();
         task_queue_.pop();
     } while (true && !is_terminate_);
-    
-    
 }
 
-void ThreadPool::Schedule(std::function<void (void)> func) {
+void ThreadPool::Schedule(Thread::Type type, Thread::ThreadFunc func) {
+    if (type == Thread::Type::kMain) {
+        main_thread_->Start();
+        return;
+    }
     std::lock_guard<std::mutex> lock(mutex_);
     {
         task_queue_.push(func);
@@ -74,7 +81,6 @@ std::shared_ptr<Thread> ThreadPool::Get(const std::string& name) {
 
 std::shared_ptr<Thread> ThreadPool::GetCurrent() {
     std::thread::id this_id = std::this_thread::get_id();
-    
     
 }
 

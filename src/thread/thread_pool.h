@@ -19,7 +19,7 @@ public:
     std::shared_ptr<Thread> Get(const std::string& name);
     std::shared_ptr<Thread> GetCurrent();
     
-    void Schedule(std::function<void (void)> func);
+    void Schedule(Thread::Type type, Thread::ThreadFunc func);
     void Terminate();
     
 private:

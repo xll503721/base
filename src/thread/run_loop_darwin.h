@@ -2,21 +2,20 @@
 #define LB_BASE_RUN_LOOP_DARWIN_PCH_H
 
 #include "../pch.h"
-#include "run_loop.h"
-
-#ifdef __OBJC__
 
 #include <CoreFoundation/CoreFoundation.h>
-#include <Foundation/Foundation.h>
 
 BEGIN_NAMESPACE_BASE_THREAD
 
 class RunLoopDarwin {
     
 public:
+    
     void SetupRunLoop();
+    void SetupMianRunLoop();
     
     bool IsMain();
+    void Post(std::function<void(void)> action);
     
 private:
     CFRunLoopRef ref_;
@@ -25,4 +24,3 @@ private:
 END_NAMESPACE_BASE_THREAD
 
 #endif /* LB_BASE_RUN_LOOP_DARWIN_PCH_H */
-#endif

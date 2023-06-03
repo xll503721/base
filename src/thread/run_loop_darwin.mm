@@ -17,11 +17,23 @@ void RunLoopDarwin::SetupRunLoop() {
     });
 }
 
+void RunLoopDarwin::SetupMianRunLoop() {
+    ref_ = CFRunLoopGetMain();
+}
+
 bool RunLoopDarwin::IsMain() {
-    CFRunLoopRef current_ref_ = CFRunLoopGetCurrent();
     CFRunLoopRef main_ref_ = CFRunLoopGetMain();
     
-    return (current_ref_ == main_ref_);
+    return (ref_ == main_ref_);
+}
+
+void RunLoopDarwin::Post(std::function<void(void)> action) {
+    if (!action) {
+        return;
+    }
+    CFRunLoopPerformBlock(ref_, kCFRunLoopDefaultMode, ^{
+        action();
+    });
 }
 
 END_NAMESPACE_BASE_THREAD
