@@ -2,7 +2,10 @@ cmake_minimum_required(VERSION 3.24)
 
 project(Base)
 
+set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64")
+set(CMAKE_OSX_SYSROOT "iphoneos")
 set(CMAKE_CXX_STANDARD 17)
+
 set(BASE_NAME_LOWER_CASE "base")
 set(BASE_NAME_UPPER_CASE "Base")
 set(BASE_BUNDLE_ID_PREFIX "cn.gz.ch")
