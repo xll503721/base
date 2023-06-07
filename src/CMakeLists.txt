@@ -71,6 +71,7 @@ include_directories(./)
 include_directories(../thirdparty)
 
 add_subdirectory(storage/memory)
+add_subdirectory(storage/database)
 add_subdirectory(string)
 add_subdirectory(json)
 add_subdirectory(thread)

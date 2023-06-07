@@ -27,8 +27,8 @@ std::shared_ptr<RunLoop> Thread::GetCurrentRunLoop() {
     return run_loop_;
 }
 
-std::thread::id Thread::GetId() {
-    
+mach_port_t Thread::GetId() {
+    return pthread_mach_thread_np(pthread_self());
 }
 
 void Thread::Start() {
@@ -42,6 +42,10 @@ void Thread::Start() {
 
 void Thread::Post(ThreadFunc func) {
     run_loop_->Post(func);
+}
+
+static bool IsMain() {
+    
 }
 
 END_NAMESPACE_BASE_THREAD

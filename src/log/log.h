@@ -53,7 +53,7 @@ public:
     
     template<typename T>
     Log& operator<<(const T& content) {
-        oss_ << std::hex << content;
+        oss_ << content;
         return *this;
     }
     

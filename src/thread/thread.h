@@ -10,7 +10,7 @@ class Thread {
     
 public:
     enum class Type {
-        kMain,
+        kMain = 1,
         kIO,
         kOther,
     };
@@ -20,7 +20,10 @@ public:
     Thread() = default;
     Thread(Type type);
     Thread(ThreadFunc func, Type type = Type::kOther);
-    std::thread::id GetId();
+    
+    static bool IsMain();
+    
+    mach_port_t GetId();
     
     std::shared_ptr<RunLoop> GetCurrentRunLoop();
     

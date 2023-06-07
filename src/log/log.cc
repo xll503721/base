@@ -31,6 +31,10 @@ line_(line),
 func_(func),
 is_print_console_(is_print_console)
 {
+    static std::once_flag token;
+    std::call_once(token, [=](){
+        mmap_file_.Create(BASE_DEVICE::Device::DefaultInstance().GetFile()->GetCachesPath() + "/mmap.log");
+    });
 }
 
 void Log::Print(Level level,
@@ -54,9 +58,10 @@ std::string Log::Format(const std::string& tag,
                    const std::string& content) {
     mach_port_t tid = pthread_mach_thread_np(pthread_self());
     std::stringstream ss;
-    ss << tag + "|" + src + "|";
+    ss << tag + "|";
     ss << tid;
     ss << "|";
+    ss << src + "|";
     ss << line;
     ss << "|";
     ss << func + "|" + content + "\n";
@@ -64,11 +69,6 @@ std::string Log::Format(const std::string& tag,
 }
 
 void Log::MmapPrint(const std::string& content) {
-    static std::once_flag token;
-    std::call_once(token, [=](){
-        mmap_file_.Create(BASE_DEVICE::Device::DefaultInstance().GetFile()->GetCachesPath() + "/mmap.log");
-    });
-
     mmap_file_.Wirte(content, content.size());
 }
 
