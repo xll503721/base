@@ -94,7 +94,7 @@ public:
             type_ = Type::kTypeDouble;
         }
         
-        Var(std::unordered_map<std::string, Var>* value) {
+        Var(std::map<std::string, Var>* value) {
             value_.map_ = value;
             type_ = Type::kTypeMap;
         }
@@ -127,7 +127,7 @@ public:
             return value_.boolean_;
         }
         
-        std::unordered_map<std::string, Var>* GetMap() {
+        std::map<std::string, Var>* GetMap() {
             if (GetType() != Type::kTypeMap) {
                 otlog_fault << "type error";
             }
@@ -157,7 +157,7 @@ public:
             float float_;
             char* c_;
             void* ptr_;
-            std::unordered_map<std::string, Var>* map_;
+            std::map<std::string, Var>* map_;
             std::vector<Var>* vector_;
         } value_;
         Type type_;
