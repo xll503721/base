@@ -119,6 +119,7 @@ set_xcode_property(${PROJECT_NAME} PUBLIC_HEADER "${base_source_h}")
 
 set_target_folder_if_exist(${BASE_STRING_LIB} ${PROJECT_NAME})
 set_target_folder_if_exist(${BASE_STORAGE_MEMORY_LIB} ${PROJECT_NAME})
+set_target_folder_if_exist(${BASE_STORAGE_DATABASE_LIB} ${PROJECT_NAME})
 set_target_folder_if_exist(${BASE_JSON} ${PROJECT_NAME})
 set_target_folder_if_exist(${BASE_THREAD} ${PROJECT_NAME})
 set_target_folder_if_exist(${BASE_MMAP} ${PROJECT_NAME})

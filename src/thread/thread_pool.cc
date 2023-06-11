@@ -125,8 +125,14 @@ std::shared_ptr<Thread> ThreadPool::Get(const std::string& name) {
 }
 
 std::shared_ptr<Thread> ThreadPool::GetCurrent() {
-    std::thread::id this_id = std::this_thread::get_id();
+    mach_port_t thread_id = pthread_mach_thread_np(pthread_self());
     
+    std::shared_ptr<Thread> thread = std::make_shared<Thread>();
+    if (all_thread_map_.find(thread_id) != all_thread_map_.end()) {
+        thread = all_thread_map_[thread_id];
+        return thread;
+    }
+    return thread;
 }
 
 ThreadPool::Task::Task(Thread::ThreadFunc func, mach_port_t transfer_thread_id):

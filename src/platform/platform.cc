@@ -94,7 +94,7 @@ std::shared_ptr<Platform::Var> Platform::Perform(const std::string& file_name, c
     if (!platform_obj_) {
         return error_var;
     }
-
+    
     std::vector<BASE_PLATFORM::Platform::Var*> params_vector;
     if (params) {
         params_vector.push_back(params);
@@ -106,25 +106,51 @@ std::shared_ptr<Platform::Var> Platform::Perform(const std::string& file_name, c
         }
         va_end(args);
     }
-
-    auto params_name_string = params_name;
-    BASE_STRING::ReplaceAll(params_name_string, "&", "");
-    BASE_STRING::ReplaceAll(params_name_string, " ", "");
-    std::vector<std::string> params_name_vector = BASE_STRING::Split(params_name_string, ",");
     
-    auto file_name_string = file_name;
-    BASE_STRING::ReplaceAll(file_name_string, ".cc", "");
-    
+    std::vector<std::string> params_name_vector;
+    std::string file_name_string;
     std::string return_type;
     std::string only_method;
-    if (!ParseMethod(method_name_full, return_type, only_method)) {
-        return error_var;
-    }
+    do {
+        if (method_name_full_and_cache_map_.find(method_name_full) != method_name_full_and_cache_map_.end()) {
+            auto cache = method_name_full_and_cache_map_[method_name_full];
+            
+            params_name_vector = cache.params_name_vector;
+            file_name_string = cache.file_name;
+            return_type = cache.return_type;
+            only_method = cache.method;
+            break;
+        }
+
+        auto params_name_string = params_name;
+        BASE_STRING::ReplaceAll(params_name_string, "&", "");
+        BASE_STRING::ReplaceAll(params_name_string, " ", "");
+        params_name_vector = BASE_STRING::Split(params_name_string, ",");
+        
+        file_name_string = file_name;
+        BASE_STRING::ReplaceAll(file_name_string, ".cc", "");
+        
+        if (!ParseMethod(method_name_full, return_type, only_method)) {
+            return error_var;
+        }
+        
+        if (isPlatform(PlatformType::kPlatformTypeiOS)) {
+            ParseMethodStyleiOS(params_name_vector, only_method);
+        }
+        
+//        if (method_name_full_and_cache_map_.find(method_name_full) != method_name_full_and_cache_map_.end()) {
+//            PlatformMethodCache cache;
+//            cache.method = only_method;
+//            cache.return_type = return_type;
+//            cache.params_name_vector = params_name_vector;
+//            cache.file_name = file_name;
+//            
+//            method_name_full_and_cache_map_[method_name_full] = cache;
+//        }
+    } while (false);
     
-    if (isPlatform(PlatformType::kPlatformTypeiOS)) {
-        ParseMethodStyleiOS(params_name_vector, only_method);
-    }
-    
+//    otlog_info << "platform obj:" << platform_obj_ << ", file name string:" << file_name_string
+//    << ", only method:" << only_method << ", is set delegate:" << is_set_delegate; /*<< ", params name vector:" << params_name_vector << ", params vector:" << params_vector;*/
     return perform_fun_(platform_obj_, file_name_string, only_method, is_set_delegate, params_name_vector, params_vector);
 }
 

@@ -44,8 +44,8 @@ void Thread::Post(ThreadFunc func) {
     run_loop_->Post(func);
 }
 
-static bool IsMain() {
-    
+bool Thread::IsMain() {
+    return true;
 }
 
 END_NAMESPACE_BASE_THREAD

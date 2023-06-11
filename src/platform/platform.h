@@ -59,11 +59,18 @@ auto PLATFORM_INVOKE_RESULT = GetPlatform()->Perform(file, func, false, parmas_s
 class Platform {
     
 public:
+    struct PlatformMethodCache {
+        std::string method;
+        std::string file_name;
+        std::string return_type;
+        std::vector<std::string> params_name_vector;
+    };
     
     class Var {
     public:
         enum class Type {
             kTypeInt,
+            kTypeInt64,
             kTypeBool,
             kTypeLong,
             kTypeFloat,
@@ -120,7 +127,21 @@ public:
             return value_.int32_;
         }
         
-        int32_t GetBool() {
+        int64_t GetInt64() {
+            if (GetType() != Type::kTypeInt64) {
+                otlog_fault << "type error";
+            }
+            return value_.int64_;
+        }
+        
+        double GetDouble() {
+            if (GetType() != Type::kTypeDouble) {
+                otlog_fault << "type error";
+            }
+            return value_.double_;
+        }
+        
+        bool GetBool() {
             if (GetType() != Type::kTypeBool) {
                 otlog_fault << "type error";
             }
@@ -201,6 +222,8 @@ private:
     
     void* platform_obj_;
     std::shared_ptr<void> c_plus_plus_obj_;
+    
+    std::map<std::string, PlatformMethodCache> method_name_full_and_cache_map_;
 };
 
 END_NAMESPACE_BASE_PLATFORM
