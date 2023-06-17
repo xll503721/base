@@ -11,11 +11,14 @@ class DataBase {
     
 public:
     DataBase(const std::string& path);
+    ~DataBase();
+    
+    bool CreateTable(const std::string& schema);
     
     bool Insert(const std::string& table_name, BASE_PLATFORM::Platform::Var& row_var);
     bool Update(const std::string& table_name, BASE_PLATFORM::Platform::Var& row_var);
     bool Delete(const std::string& table_name, BASE_PLATFORM::Platform::Var& row_var);
-    bool Query(const std::string& table_name, BASE_PLATFORM::Platform::Var& row_var);
+    bool Select(const std::string& table_name, BASE_PLATFORM::Platform::Var& row_var);
     
 private:
     bool Verify(BASE_PLATFORM::Platform::Var& row_var);

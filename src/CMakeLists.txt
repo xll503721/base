@@ -87,6 +87,7 @@ find_library(FOUNDATION Foundation)
 find_library(MOBILECORESERVICES MobileCoreServices)
 find_library(CFNETWORK CFNetwork)
 find_library(SYSTEMCONFIGURATION SystemConfiguration)
+find_library(SQLITE3_LIBRARY sqlite3)
 
 add_library(${PROJECT_NAME} SHARED ${base_source_h} ${base_source_cc})
 add_dependencies(${PROJECT_NAME} 
@@ -98,6 +99,7 @@ add_dependencies(${PROJECT_NAME}
                     ${BASE_LOG}
                     ${BASE_DEVICE}
                     ${BASE_PLATFORM}
+                    ${BASE_STORAGE_DATABASE_LIB}
                     jansson)
                     
 
@@ -110,8 +112,10 @@ target_link_libraries(${PROJECT_NAME}
                          ${BASE_LOG}
                          ${BASE_DEVICE}
                          ${BASE_PLATFORM}
+                         ${BASE_STORAGE_DATABASE_LIB}
                          ${UIKIT} 
                          ${FOUNDATION}
+                         ${SQLITE3_LIBRARY}
                          jansson)
 
 apple_framework_generate(${PROJECT_NAME} ${BASE_BUNDLE_ID} ${PROJECT_NAME} "")

@@ -9,26 +9,22 @@
 
 BEGIN_NAMESPACE_BASE_STRING
 
-// trim from start (in place)
 void LeftTrim(std::string& s) {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](char ch) {
       return ch != ' ';
     }));
 }
 
-// trim from end (in place)
 void RightTrim(std::string& s) {
     s.erase(std::find_if(s.rbegin(), s.rend(), [](char ch) {
       return ch != ' ';
     }).base(), s.end());
 }
 
-// trim from both ends (in place)
 void Trim(std::string& s) {
     LeftTrim(s);
     RightTrim(s);
 }
-
 
 void ReplaceAll(std::string& str, const std::string& from, const std::string& to) {
     size_t start_pos = 0;
@@ -67,14 +63,14 @@ std::vector<std::string> Split(const std::string& target_str, const std::string&
 }
 
 std::string Join(const std::vector<std::string>& list, const std::string& separator) {
-  std::stringstream ss;
-  for (size_t i = 0; i < list.size(); i++) {
-    ss << list[i];
-    if (i != list.size() - 1) {
-      ss << separator;
+    std::stringstream ss;
+    for (size_t i = 0; i < list.size(); i++) {
+        ss << list[i];
+        if (i != list.size() - 1) {
+            ss << separator;
+        }
     }
-  }
-  return ss.str();
+    return ss.str();
 }
 
 END_NAMESPACE_BASE_STRING

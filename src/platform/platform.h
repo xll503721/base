@@ -93,12 +93,12 @@ public:
         
         Var(const std::string& value) {
             value_.c_ = const_cast<char*>(value.c_str());
-            type_ = Type::kTypeDouble;
+            type_ = Type::kTypeString;
         }
         
         Var(const char* value) {
             value_.c_ = const_cast<char*>(value);
-            type_ = Type::kTypeDouble;
+            type_ = Type::kTypeString;
         }
         
         Var(std::map<std::string, Var>* value) {
@@ -167,6 +167,26 @@ public:
                 otlog_fault << "type error";
             }
             return value_.ptr_;
+        }
+        
+        void SetInt32(int32_t value) {
+            value_.int32_ = value;
+            type_ = Type::kTypeInt;
+        }
+        
+        void SetInt64(int64_t value) {
+            value_.int64_ = value;
+            type_ = Type::kTypeInt64;
+        }
+        
+        void SetString(const std::string& value) {
+            value_.c_ = const_cast<char*>(value.c_str());
+            type_ = Type::kTypeString;
+        }
+        
+        void SetDouble(double value) {
+            value_.double_ = value;
+            type_ = Type::kTypeDouble;
         }
         
     private:
