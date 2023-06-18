@@ -40,6 +40,9 @@ string(CONCAT BASE_DEVICE ${BASE_NAME_LOWER_CASE} "_device")
 set(BASE_PLATFORM "")
 string(CONCAT BASE_PLATFORM ${BASE_NAME_LOWER_CASE} "_platform")
 
+set(BASE_ANALYTICS "")
+string(CONCAT BASE_ANALYTICS ${BASE_NAME_LOWER_CASE} "_analytics")
+
 file(GLOB
      base_source_cc
      *.cc)
@@ -79,6 +82,7 @@ add_subdirectory(mmap)
 add_subdirectory(log)
 add_subdirectory(device)
 add_subdirectory(platform)
+add_subdirectory(analytics)
 #thirdparty
 add_subdirectory(./../thirdparty/jansson jansson)
 
@@ -100,6 +104,7 @@ add_dependencies(${PROJECT_NAME}
                     ${BASE_DEVICE}
                     ${BASE_PLATFORM}
                     ${BASE_STORAGE_DATABASE_LIB}
+                    ${BASE_ANALYTICS}
                     jansson)
                     
 
@@ -116,6 +121,7 @@ target_link_libraries(${PROJECT_NAME}
                          ${UIKIT} 
                          ${FOUNDATION}
                          ${SQLITE3_LIBRARY}
+                         ${BASE_ANALYTICS}
                          jansson)
 
 apple_framework_generate(${PROJECT_NAME} ${BASE_BUNDLE_ID} ${PROJECT_NAME} "")
@@ -130,6 +136,7 @@ set_target_folder_if_exist(${BASE_MMAP} ${PROJECT_NAME})
 set_target_folder_if_exist(${BASE_LOG} ${PROJECT_NAME})
 set_target_folder_if_exist(${BASE_DEVICE} ${PROJECT_NAME})
 set_target_folder_if_exist(${BASE_PLATFORM} ${PROJECT_NAME})
+set_target_folder_if_exist(${BASE_ANALYTICS} ${PROJECT_NAME})
 
 if(${CMAKE_VERSION} VERSION_GREATER "3.16.0")
     target_precompile_headers(${PROJECT_NAME} PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:${BASE_ROOT}/pch.h>")
