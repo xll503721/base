@@ -266,6 +266,7 @@ set (JANSSON_INITIAL_HASHTABLE_ORDER 3 CACHE STRING "Number of buckets new objec
 # configure the public config file
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cmake/jansson_config.h.cmake
                 ${CMAKE_CURRENT_BINARY_DIR}/include/jansson_config.h)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cmake/jansson_config.h.cmake ${CMAKE_CURRENT_SOURCE_DIR}/src/jansson_config.h)
 
 # Copy the jansson.h file to the public include folder
 file (COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/jansson.h
