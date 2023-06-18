@@ -203,8 +203,8 @@ bool DataBase::Select(const std::string& table_name, BASE_PLATFORM::Platform::Va
                 default:
                     break;
             }
+            map->operator[](key) = value;
         }
-        
         index++;
     } while (ret_step == SQLITE_ROW);
     
