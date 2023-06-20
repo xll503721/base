@@ -193,6 +193,7 @@ public:
         union ValueHolder {
             int64_t int64_;
             int32_t int32_;
+            unsigned long u_long_;
             bool boolean_;
             double double_;
             float float_;
