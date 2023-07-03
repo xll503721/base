@@ -6,7 +6,7 @@
 //
 
 #include "run_loop.h"
-#include <platform/platform.h>
+#include <cross/platform.h>
 
 BEGIN_NAMESPACE_BASE_THREAD
 

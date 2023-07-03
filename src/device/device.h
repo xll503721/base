@@ -2,7 +2,7 @@
 #define LB_BASE_DEVICE_PCH_H
 
 #include "../pch.h"
-#include <platform/platform.h>
+#include <cross/platform.h>
 
 BEGIN_NAMESPACE_BASE_DEVICE
 

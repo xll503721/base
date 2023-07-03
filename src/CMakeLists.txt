@@ -81,7 +81,7 @@ add_subdirectory(thread)
 add_subdirectory(mmap)
 add_subdirectory(log)
 add_subdirectory(device)
-add_subdirectory(platform)
+add_subdirectory(cross)
 add_subdirectory(analytics)
 #thirdparty
 add_subdirectory(./../thirdparty/jansson jansson)

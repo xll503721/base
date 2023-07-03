@@ -3,7 +3,7 @@
 
 #include "../../pch.h"
 #include <sqlite3.h>
-#include <platform/platform.h>
+#include <cross/platform.h>
 
 BEGIN_NAMESPACE_BASE_STORAGE_DATABASE
 

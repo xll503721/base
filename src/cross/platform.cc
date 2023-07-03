@@ -13,11 +13,11 @@ BEGIN_NAMESPACE_BASE_PLATFORM
 
 Platform::PlatformInit Platform::init_fun_ = nullptr;
 Platform::PlatformPerform Platform::perform_fun_ = nullptr;
+Platform::PlatformSetDelegate Platform::set_delegate_fun_ = nullptr;
 
 Platform::Platform(const std::string& class_name, std::shared_ptr<void> c_plus_plus_obj):
 platform_obj_(nullptr),
 c_plus_plus_obj_(c_plus_plus_obj) {
-    
 }
 
 bool Platform::isPlatform(PlatformType type) {
@@ -73,7 +73,11 @@ void Platform::SetPerformMehtod(PlatformPerform method) {
     perform_fun_ = method;
 }
 
-void Platform::Init(const std::string& file_name, const std::string& class_name, void* c_plus_plus_obj) {
+void Platform::SetPerformDelegate(PlatformSetDelegate method) {
+    set_delegate_fun_ = method;
+}
+
+void Platform::Init(const std::string& file_name, const std::string& class_name, std::shared_ptr<void> c_plus_plus_obj) {
     if (!init_fun_) {
         return nullptr;
     }
@@ -88,10 +92,21 @@ void Platform::Init(const std::string& file_name, const std::string& class_name,
     }
 }
 
+void Platform::SetDelegate(std::shared_ptr<void> delegate, const std::string& file_name) {
+    if (!set_delegate_fun_) {
+        return;
+    }
+    
+    auto file_name_string = file_name;
+    BASE_STRING::ReplaceAll(file_name_string, ".cc", "");
+    BASE_STRING::ReplaceAll(file_name_string, ".h", "");
+    set_delegate_fun_(platform_obj_, file_name_string, delegate);
+}
+
 std::shared_ptr<Platform::Var> Platform::Perform(const std::string& file_name, const std::string& method_name_full, bool is_set_delegate, const std::string& params_name, BASE_PLATFORM::Platform::Var* params, ...) {
     std::shared_ptr<Platform::Var> error_var;
     
-    if (!platform_obj_) {
+    if (!platform_obj_ || !perform_fun_) {
         return error_var;
     }
     
