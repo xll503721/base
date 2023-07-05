@@ -32,7 +32,7 @@ static NSString *kOTOnetenSDKDelegate = @"ObjectDelegate";
 }
 
 - (void)_setPlatformInfo {
-    BASE_PLATFORM::Platform::SetInitMehtod([=] (const std::string& file_name, const std::string& class_name, std::shared_ptr<void> c_plus_plus_obj) {
+    BASE_PLATFORM::Platform::SetInitMehtod([=] (const std::string& class_name, std::shared_ptr<void> c_plus_plus_obj) {
         NSString *className = [NSString stringWithUTF8String:class_name.c_str()];
         id target = [self _platformInitWithClazzName:className];
         return (__bridge_retained void *)target;
@@ -48,35 +48,43 @@ static NSString *kOTOnetenSDKDelegate = @"ObjectDelegate";
             return;
         }
         
-        NSString *fileName = [[NSString stringWithUTF8String:file_name.c_str()] lowercaseString];
-        NSArray<NSString *> *fileNames = [fileName componentsSeparatedByString:@"_"];
-        __block NSString *ocFileName = (NSString *)kOTOnetenSDKPrefix;
-        [fileNames enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            ocFileName = [ocFileName stringByAppendingString:[obj capitalizedString]];
-        }];
-        ocFileName = [ocFileName stringByAppendingString:kOTOnetenSDKDelegate];
-        
-        id delegate = (id)[self _platformInitWithClazzName:ocFileName];
-        SEL selector = @selector(setDelegate:);
-        if (![target respondsToSelector:selector]) {
-            return;
-        }
-        
-        //only set, no alloc，new，copy or mutableCopy,
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-        [target performSelector:selector withObject:delegate];
-#pragma clang diagnostic pop
-        
-        SEL setRawPrtSelector = @selector(setRawPrt:);
-        if (![delegate respondsToSelector:setRawPrtSelector]) {
+        SEL getSelector = @selector(delegate);
+        if (![target respondsToSelector:getSelector]) {
             return;
         }
         
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-//            [target performSelector:setRawPrtSelector withObject:(__bridge void *)c_plus_plus_obj.get()];
+        id<OTPlatformObjectDelegate> delegate = [target performSelector:getSelector];
 #pragma clang diagnostic pop
+        if (!delegate) {
+            NSString *fileName = [[NSString stringWithUTF8String:file_name.c_str()] lowercaseString];
+            NSArray<NSString *> *fileNames = [fileName componentsSeparatedByString:@"_"];
+            __block NSString *ocFileName = (NSString *)kOTOnetenSDKPrefix;
+            [fileNames enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                ocFileName = [ocFileName stringByAppendingString:[obj capitalizedString]];
+            }];
+            ocFileName = [ocFileName stringByAppendingString:kOTOnetenSDKDelegate];
+            
+            delegate = (id)[self _platformInitWithClazzName:ocFileName];
+            SEL setSelector = @selector(setDelegate:);
+            if (![target respondsToSelector:setSelector]) {
+                return;
+            }
+            
+            //only set, no alloc，new，copy or mutableCopy,
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+            [target performSelector:setSelector withObject:delegate];
+    #pragma clang diagnostic pop
+        }
+        
+        SEL setCPlusPlusPrtSelector = @selector(setCPlusPlusPrt:);
+        if (![delegate respondsToSelector:setCPlusPlusPrtSelector]) {
+            return;
+        }
+        
+        delegate.cPlusPlusPrt = c_plus_plus_obj.get();
     });
     
     BASE_PLATFORM::Platform::SetPerformMehtod([=] (const void* platform_obj,

@@ -9,6 +9,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol OTPlatformObjectDelegate <NSObject>
+
+@required
+@property void* cPlusPlusPrt;
+
+@end
+
 @interface OTPlatform : NSObject
 
 @end

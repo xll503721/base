@@ -22,8 +22,8 @@ public:\
     std::shared_ptr<BASE_PLATFORM::Platform> GetPlatform() {\
         if (!platform_) {\
             platform_ = std::make_shared<BASE_PLATFORM::Platform>(platform_obj_name_, shared_from_this());\
-            std::string delegate_file(__FILE_NAME__);\
-            platform_->Init(delegate_file, platform_obj_name_, shared_from_this());\
+            platform_->Init(platform_obj_name_, shared_from_this());\
+            PLATFORM_SET_DELEGATE(shared_from_this());\
         }\
         return platform_;\
     }\
@@ -40,8 +40,8 @@ public:\
     std::shared_ptr<BASE_PLATFORM::Platform> GetPlatform() {\
         if (!platform_) {\
             platform_ = std::make_shared<BASE_PLATFORM::Platform>(platform_obj_name_, shared_from_this());\
-            std::string delegate_file(__FILE_NAME__);\
-            platform_->Init(delegate_file, platform_obj_name_, shared_from_this());\
+            platform_->Init(platform_obj_name_, shared_from_this());\
+            PLATFORM_SET_DELEGATE(shared_from_this());\
         }\
         return platform_;\
     }\
@@ -239,12 +239,12 @@ public:
     
     static Var GetVar(Var var);
     
-    using PlatformInit = std::function<void* (const std::string& file_name, const std::string& class_name, std::shared_ptr<void> c_plus_plus_obj)>;
+    using PlatformInit = std::function<void* (const std::string& class_name, std::shared_ptr<void> c_plus_plus_obj)>;
     using PlatformSetDelegate = std::function<void (const void* platform_obj, const std::string& file_name, std::shared_ptr<void> c_plus_plus_obj)>;
     using PlatformPerform = std::function<std::shared_ptr<Var> (const void* platform_obj, const std::string& file_name, const std::string& method_name, bool is_set_delegate, const std::vector<std::string>& params_name, const std::vector<Platform::Var*>& params)>;
     
     
-    void Init(const std::string& file_name, const std::string& class_name, std::shared_ptr<void> c_plus_plus_obj);
+    void Init(const std::string& class_name, std::shared_ptr<void> c_plus_plus_obj);
     void SetDelegate(std::shared_ptr<void> delegate, const std::string& file_name);
     std::shared_ptr<Var> Perform(const std::string& file_name, const std::string& method_name_full, bool is_set_delegate, const std::string& params_name, Platform::Var* params, ...) __attribute__((sentinel(0,1)));
     

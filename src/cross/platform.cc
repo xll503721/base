@@ -77,18 +77,14 @@ void Platform::SetPerformDelegate(PlatformSetDelegate method) {
     set_delegate_fun_ = method;
 }
 
-void Platform::Init(const std::string& file_name, const std::string& class_name, std::shared_ptr<void> c_plus_plus_obj) {
+void Platform::Init(const std::string& class_name, std::shared_ptr<void> c_plus_plus_obj) {
     if (!init_fun_) {
         return nullptr;
     }
     
-    auto file_name_string = file_name;
-    BASE_STRING::ReplaceAll(file_name_string, ".cc", "");
-    BASE_STRING::ReplaceAll(file_name_string, ".h", "");
-    
-    platform_obj_ = init_fun_(file_name_string, class_name, c_plus_plus_obj);
+    platform_obj_ = init_fun_(class_name, c_plus_plus_obj);
     if (!platform_obj_) {
-        otlog_fault << "platform_obj create failed, check file_name_string:" << file_name_string << ", class_name:" << class_name << ", c_plus_plus_obj:" << c_plus_plus_obj;
+        otlog_fault << "platform_obj create failed, check class_name:" << class_name << ", c_plus_plus_obj:" << c_plus_plus_obj;
     }
 }
 
