@@ -73,10 +73,10 @@ static NSString *kOTOnetenSDKDelegate = @"ObjectDelegate";
             }
             
             //only set, no alloc，new，copy or mutableCopy,
-    #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
             [target performSelector:setSelector withObject:delegate];
-    #pragma clang diagnostic pop
+#pragma clang diagnostic pop
         }
         
         SEL setCPlusPlusPrtSelector = @selector(setCPlusPlusPrt:);
