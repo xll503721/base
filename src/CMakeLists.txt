@@ -43,6 +43,9 @@ string(CONCAT BASE_PLATFORM ${BASE_NAME_LOWER_CASE} "_platform")
 set(BASE_ANALYTICS "")
 string(CONCAT BASE_ANALYTICS ${BASE_NAME_LOWER_CASE} "_analytics")
 
+set(BASE_NETWROK_HTTPS "")
+string(CONCAT BASE_NETWROK_HTTPS ${BASE_NAME_LOWER_CASE} "_https")
+
 file(GLOB
      base_source_cc
      *.cc)
@@ -83,6 +86,7 @@ add_subdirectory(log)
 add_subdirectory(device)
 add_subdirectory(cross)
 add_subdirectory(analytics)
+add_subdirectory(network/http:s)
 #thirdparty
 add_subdirectory(./../thirdparty/jansson jansson)
 
@@ -105,6 +109,7 @@ add_dependencies(${PROJECT_NAME}
                     ${BASE_PLATFORM}
                     ${BASE_STORAGE_DATABASE_LIB}
                     ${BASE_ANALYTICS}
+                    ${BASE_NETWROK_HTTPS}
                     jansson)
                     
 
@@ -122,6 +127,7 @@ target_link_libraries(${PROJECT_NAME}
                          ${FOUNDATION}
                          ${SQLITE3_LIBRARY}
                          ${BASE_ANALYTICS}
+                         ${BASE_NETWROK_HTTPS}
                          jansson)
 
 apple_framework_generate(${PROJECT_NAME} ${BASE_BUNDLE_ID} ${PROJECT_NAME} "")
@@ -137,6 +143,7 @@ set_target_folder_if_exist(${BASE_LOG} ${PROJECT_NAME})
 set_target_folder_if_exist(${BASE_DEVICE} ${PROJECT_NAME})
 set_target_folder_if_exist(${BASE_PLATFORM} ${PROJECT_NAME})
 set_target_folder_if_exist(${BASE_ANALYTICS} ${PROJECT_NAME})
+set_target_folder_if_exist(${BASE_NETWROK_HTTPS} ${PROJECT_NAME})
 
 if(${CMAKE_VERSION} VERSION_GREATER "3.16.0")
     target_precompile_headers(${PROJECT_NAME} PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:${BASE_ROOT}/pch.h>")

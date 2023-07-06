@@ -93,6 +93,7 @@ void Platform::SetDelegate(std::shared_ptr<void> delegate, const std::string& fi
         return;
     }
     
+    c_plus_plus_obj_ = delegate;
     auto file_name_string = file_name;
     BASE_STRING::ReplaceAll(file_name_string, ".cc", "");
     BASE_STRING::ReplaceAll(file_name_string, ".h", "");
