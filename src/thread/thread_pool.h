@@ -9,15 +9,13 @@ BEGIN_NAMESPACE_BASE_THREAD
 class ThreadPool {
     
 public:
-    class Task {
-    public:
-        Task(Thread::ThreadFunc func, mach_port_t transfer_thread_id = 0);
-        
-        Thread::ThreadFunc func_;
-        mach_port_t transfer_thread_id_ = 0;
+    struct Task {
+        Thread::ThreadFunc func;
+        mach_port_t transfer_thread_id = 0;
+        Thread::Type type = Thread::Type::kOther;
     };
     
-    ThreadPool(int32_t thread_num);
+    ThreadPool(int32_t thread_num, BASE_THREAD::Thread::Type type = BASE_THREAD::Thread::Type::kOther);
     
     static ThreadPool& DefaultPool();
     

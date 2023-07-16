@@ -12,6 +12,7 @@ public:
     enum class Type {
         kMain = 1,
         kIO,
+        kHTTP,
         kOther,
     };
     

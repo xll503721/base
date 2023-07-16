@@ -10,15 +10,37 @@
 
 #include "../../pch.h"
 
+#include <thread/thread_pool.h>
+
 BEGIN_NAMESPACE_BASE_HTTPS
 
 class HTTPsClient {
     
-    
 public:
     
-    void Test();
+    enum class Status {
+        kStatus200 = 200,
+        kStatus500 = 500,
+        kStatus404 = 404,
+    };
     
+    struct Configuration {
+        uint32_t timeout;
+        std::string host;
+    };
+    
+    static HTTPsClient& DefaultClient(const std::string& host);
+    
+    HTTPsClient(const Configuration& config);
+    
+    using RequestCompletion = std::function<void (HTTPsClient* client, HTTPsClient::Status status, const std::string& body)>;
+    
+    void Get(const std::string& url_string, RequestCompletion requestCompletion);
+    
+private:
+    Configuration config_;
+    
+    BASE_THREAD::ThreadPool thread_pool_;
 };
 
 END_NAMESPACE_BASE_HTTPS
