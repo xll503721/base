@@ -61,6 +61,11 @@ Platform::PlatformType Platform::platform() {
 #endif
 }
 
+Platform::~Platform() {
+    CFTypeRef cfObject = static_cast<CFTypeRef>(platform_obj_);
+    CFRelease(cfObject);
+}
+
 Platform::Var Platform::GetVar(Var var) {
     return var;
 }

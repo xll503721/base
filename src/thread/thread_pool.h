@@ -12,10 +12,12 @@ public:
     struct Task {
         Thread::ThreadFunc func;
         mach_port_t transfer_thread_id = 0;
+        mach_port_t transfer_back_thread_id = 0;
         Thread::Type type = Thread::Type::kOther;
     };
     
     ThreadPool(int32_t thread_num, BASE_THREAD::Thread::Type type = BASE_THREAD::Thread::Type::kOther);
+    ~ThreadPool();
     
     static ThreadPool& DefaultPool();
     
@@ -31,6 +33,7 @@ public:
     void Terminate();
     
 private:
+    void Init(int32_t thread_num, BASE_THREAD::Thread::Type type);
     void Execute();
     void TaskSchedule(Thread::Type type, Task task);
     
@@ -44,13 +47,12 @@ private:
     std::queue<Task> task_queue_;
     
     std::condition_variable cv_;
-    std::mutex cv_mutex;
-    
     std::mutex mutex_;
     
-    bool is_terminate_ = false;
-    
     thread_local static mach_port_t transfer_thread_id_;
+    
+// pool control
+    bool pool_is_terminate_ = false;
 };
 
 END_NAMESPACE_BASE_THREAD

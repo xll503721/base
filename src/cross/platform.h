@@ -11,6 +11,8 @@
 #include "../pch.h"
 #include <log/log.h>
 
+#include <CoreFoundation/CoreFoundation.h>
+
 BEGIN_NAMESPACE_BASE_PLATFORM
 
 /* declaration and definition platform object*/
@@ -235,6 +237,7 @@ public:
     };
     
     Platform() = default;
+    ~Platform();
     Platform(const std::string& class_name, std::shared_ptr<void> c_plus_plus_obj);
     
     static Var GetVar(Var var);
@@ -270,7 +273,7 @@ public:
 private:
     
     void* platform_obj_;
-    std::shared_ptr<void> c_plus_plus_obj_;
+    std::weak_ptr<void> c_plus_plus_obj_;
     
     std::map<std::string, PlatformMethodCache> method_name_full_and_cache_map_;
 };
