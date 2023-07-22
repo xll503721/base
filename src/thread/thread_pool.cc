@@ -18,11 +18,19 @@ ThreadPool &ThreadPool::DefaultPool() {
     return pool;
 }
 
-ThreadPool::ThreadPool(int32_t thread_num, BASE_THREAD::Thread::Type type) {
+ThreadPool::~ThreadPool() {
+    otlog_info << "~ThreadPool";
+}
+
+ThreadPool::ThreadPool(int32_t thread_num, BASE_THREAD::Thread::Type type){
+    Init(thread_num, type);
+}
+
+void ThreadPool::Init(int32_t thread_num, BASE_THREAD::Thread::Type type) {
     main_thread_ = std::make_shared<Thread>(Thread::Type::kMain);
     all_thread_map_[main_thread_->GetId()] = main_thread_;
-    
-    std::lock_guard<std::mutex> lock(mutex_);
+    pool_thread_ = std::make_shared<Thread>(std::bind(&ThreadPool::PoolExecute, this), Thread::Type::kPool);
+    pool_thread_->Start();
     
     thread_num_ = thread_num;
     otlog_info << "create:" << thread_num_ << " count thread";
@@ -34,16 +42,29 @@ ThreadPool::ThreadPool(int32_t thread_num, BASE_THREAD::Thread::Type type) {
     }
 }
 
+void ThreadPool::PoolExecute() {
+    do {
+        std::unique_lock<std::mutex> lock(pool_mutex_);
+        pool_cv_.wait(lock, [this] {
+            return pool_task_queue_.size() > 0;
+        });
+        
+        auto task = pool_task_queue_.front();
+        task();
+        pool_task_queue_.pop();
+    } while (true);
+}
+
 void ThreadPool::Execute() {
     do {
         otlog_info << "task queue size:" << task_queue_.size();
-        std::unique_lock<std::mutex> lock(cv_mutex);
+        std::unique_lock<std::mutex> lock(mutex_);
         cv_.wait(lock, [this] {
             return task_queue_.size() > 0;
         });
         
         auto task = task_queue_.front();
-        otlog_info << "check task transfer_thread_id:" << static_cast<int32_t>(transfer_thread_id_) << ", type:" << static_cast<int32_t>(task.type);
+        otlog_info << "check task transfer_thread_id:" << static_cast<int32_t>(task.transfer_thread_id) << ", transfer_back_thread_id:" << static_cast<int32_t>(task.transfer_back_thread_id) << ", type:" << static_cast<int32_t>(task.type);
         
         auto TaskExecute = [=]() {
             otlog_info << "begin execute task func";
@@ -52,69 +73,101 @@ void ThreadPool::Execute() {
             otlog_info << "end execute task func";
         };
         
-        if (task.transfer_thread_id == 0) {
-            TaskExecute();
+        if (task.type == Thread::Type::kMain) {
+            otlog_info << "add task to main thread, transfer thread id:" << task.transfer_thread_id;
+            main_thread_->Post([=]() {
+                transfer_thread_id_ = task.transfer_thread_id;
+                task.func();
+            });
+            task_queue_.pop();
             continue;
         }
         
         auto thread_id = pthread_mach_thread_np(pthread_self());
-        if (task.transfer_thread_id == thread_id) {
-            TaskExecute();
+        if (task.transfer_back_thread_id != 0) {
+            if (task.transfer_back_thread_id == thread_id) {
+                transfer_thread_id_ = 0;
+                TaskExecute();
+            }
+            continue;
         }
         
-    } while (true && !is_terminate_);
+        transfer_thread_id_ = task.transfer_thread_id;
+        TaskExecute();
+        
+    } while (true && !pool_is_terminate_);
 }
 
 void ThreadPool::TaskSchedule(Thread::Type type, Task task) {
-    if (type == Thread::Type::kMain) {
-        otlog_info << "add task to main thread, transfer thread id:" << task.transfer_thread_id;
-        main_thread_->Post([=]() {
-            transfer_thread_id_ = task.transfer_thread_id;
-            task.func();
-        });
-        return;
-    }
-    
     otlog_info << "add task in type:" << std::to_string(static_cast<int32_t>(type)) << ", transfer thread id:" << task.transfer_thread_id;
     
-    task_queue_.push(task);
-    std::unique_lock<std::mutex> lock(cv_mutex);
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        task_queue_.push(task);
+    }
+    otlog_info << "notify all";
     cv_.notify_all();
 }
 
 void ThreadPool::ScheduleTransfer(Thread::Type type, Thread::ThreadFunc func) {
     otlog_info << "type:" << static_cast<int32_t>(type) << ", transfer thread id:" << transfer_thread_id_;
+    
     Task task;
     task.func = func;
     task.transfer_thread_id = pthread_mach_thread_np(pthread_self());
     task.type = type;
-    TaskSchedule(type, task);
+    
+    Thread::ThreadFunc pool_func = [=]() {
+        TaskSchedule(type, task);
+    };
+    
+    {
+        std::unique_lock<std::mutex> lock(pool_mutex_);
+        pool_task_queue_.push(pool_func);
+    }
+    pool_cv_.notify_one();
 }
 
 void ThreadPool::ScheduleTransferBack(Thread::Type type, Thread::ThreadFunc func) {
     otlog_info << "type:" << static_cast<int32_t>(type) << ", back to thread:" << transfer_thread_id_;
     if (transfer_thread_id_ == 0) {
         otlog_fault << "transfer thread id not set, please use `void ThreadPool::Schedule(Thread::Type type, Thread::ThreadFunc func)` instead";
-        Schedule(type, func);
         return;
     }
     
     Task task;
     task.func = func;
-    task.transfer_thread_id = transfer_thread_id_;
+    task.transfer_back_thread_id = transfer_thread_id_;
     task.type = type;
-    TaskSchedule(type, task);
+    
+    Thread::ThreadFunc pool_func = [=]() {
+        TaskSchedule(type, task);
+    };
+    
+    {
+        std::unique_lock<std::mutex> lock(pool_mutex_);
+        pool_task_queue_.push(pool_func);
+    }
+    pool_cv_.notify_one();
 }
 
 void ThreadPool::Schedule(Thread::Type type, Thread::ThreadFunc func) {
-    Task task;
-    task.func = func;
-    task.type = type;
-    TaskSchedule(type, task);
+    Thread::ThreadFunc pool_func = [=]() {
+        Task task;
+        task.func = func;
+        task.type = type;
+        TaskSchedule(type, task);
+    };
+    
+    {
+        std::unique_lock<std::mutex> lock(pool_mutex_);
+        pool_task_queue_.push(pool_func);
+    }
+    pool_cv_.notify_one();
 }
 
 void ThreadPool::Terminate() {
-    is_terminate_ = true;
+    pool_is_terminate_ = true;
 }
 
 std::shared_ptr<Thread> ThreadPool::GetMain() {

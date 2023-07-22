@@ -14,6 +14,7 @@ public:
         kIO,
         kHTTP,
         kOther,
+        kPool,
     };
     
     using ThreadFunc = std::function<void()>;
