@@ -14,6 +14,9 @@ Thread::Thread(Type type):type_(type) {
     run_loop_ = std::make_shared<RunLoop>();
     if (type == Type::kMain) {
         run_loop_->SetupMainRunLoop();
+        run_loop_->Post([=]() {
+            id_ = pthread_mach_thread_np(pthread_self());
+        });
     }
 }
 
@@ -27,8 +30,12 @@ std::shared_ptr<RunLoop> Thread::GetCurrentRunLoop() {
     return run_loop_;
 }
 
+std::weak_ptr<Thread> Thread::GetCurrentThread() {
+    return self;
+}
+
 mach_port_t Thread::GetId() {
-    return pthread_mach_thread_np(pthread_self());
+    return id_;
 }
 
 void Thread::Start() {
@@ -36,7 +43,12 @@ void Thread::Start() {
         otlog_fault << "this thread is main, could not start";
         return;
     }
-    std::thread thread(func_);
+
+    std::thread thread([=]() {
+        id_ = pthread_mach_thread_np(pthread_self());
+        self = shared_from_this();
+        func_();
+    });
     thread.detach();
 }
 

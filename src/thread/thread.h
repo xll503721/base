@@ -6,7 +6,7 @@
 
 BEGIN_NAMESPACE_BASE_THREAD
 
-class Thread {
+class Thread: public std::enable_shared_from_this<Thread> {
     
 public:
     enum class Type {
@@ -26,7 +26,7 @@ public:
     static bool IsMain();
     
     mach_port_t GetId();
-    
+    static std::weak_ptr<Thread> GetCurrentThread();
     std::shared_ptr<RunLoop> GetCurrentRunLoop();
     
     void Start();
@@ -36,7 +36,10 @@ private:
     std::shared_ptr<RunLoop> run_loop_;
     ThreadFunc func_;
     Type type_;
+    mach_port_t id_;
 };
+
+thread_local static std::weak_ptr<Thread> self;
 
 END_NAMESPACE_BASE_THREAD
 

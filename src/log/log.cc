@@ -11,7 +11,7 @@
 BEGIN_NAMESPACE_BASE_LOG
 
 static const char* log_levels[] {
-    nullptr, "info", "fault", "error", nullptr,
+    nullptr, "info", "🛑fault", "error", nullptr,
 };
 
 static BASE_MMAP::MmapFile mmap_file_;
@@ -46,7 +46,7 @@ void Log::Print(Level level,
         printf("%s", content.c_str());
     }
     if (level == Level::kFault) {
-//        RESUMABLE_ASSERT_DEBUG_BREAK();
+        RESUMABLE_ASSERT_DEBUG_BREAK();
     }
     Log::MmapPrint(content);
 }

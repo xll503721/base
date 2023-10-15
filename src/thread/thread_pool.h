@@ -11,8 +11,6 @@ class ThreadPool {
 public:
     struct Task {
         Thread::ThreadFunc func;
-        mach_port_t transfer_thread_id = 0;
-        mach_port_t transfer_back_thread_id = 0;
         Thread::Type type = Thread::Type::kOther;
     };
     struct PoolTask {
@@ -31,22 +29,20 @@ public:
     std::shared_ptr<Thread> GetCurrent();
     
     void Schedule(Thread::Type type, Thread::ThreadFunc func);
-    void ScheduleTransfer(Thread::Type type, Thread::ThreadFunc func);
-    void ScheduleTransferBack(Thread::Type type, Thread::ThreadFunc func);
     void Terminate();
     
 private:
     void Init(int32_t thread_num, BASE_THREAD::Thread::Type type);
     void Execute();
-    void TaskSchedule(Thread::Type type, Task task);
-    
-    void PoolExecute();
+    void TaskSchedule(Task task);
     
 private:
     std::map<mach_port_t, std::shared_ptr<Thread>> io_thread_map_;
     std::map<mach_port_t, std::shared_ptr<Thread>> any_thread_map_;
     std::map<mach_port_t, std::shared_ptr<Thread>> all_thread_map_;
+    std::vector<std::shared_ptr<Thread>> all_thread_vector_;
     std::shared_ptr<Thread> main_thread_;
+    std::shared_ptr<Thread> https_thread_;
     
     int32_t thread_num_;
     std::queue<Task> task_queue_;
@@ -54,15 +50,7 @@ private:
     std::condition_variable cv_;
     std::mutex mutex_;
     
-    thread_local static mach_port_t transfer_thread_id_;
-    
-// pool control
     bool pool_is_terminate_ = false;
-    
-    std::condition_variable pool_cv_;
-    std::mutex pool_mutex_;
-    std::queue<Thread::ThreadFunc> pool_task_queue_;
-    std::shared_ptr<Thread> pool_thread_;
 };
 
 END_NAMESPACE_BASE_THREAD

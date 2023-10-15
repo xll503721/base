@@ -10,8 +10,8 @@
 
 BEGIN_NAMESPACE_BASE_ANALYTICS
 
-static const std::string host = "http://www.wenku8.net";
-static const std::string path = "/";
+static const std::string host = "http://localhost:8088";
+static const std::string path = "/adn/queryId";
 static const std::string database_name = "tracker_database_name";
 
 Tracker& Tracker::DefaultTracker() {
@@ -32,13 +32,11 @@ https_client_(BASE_HTTPS::HTTPsClient::DefaultClient(host)) {
 
 void Tracker::Send(const std::string& event_name, std::map<std::string, std::string>& event_properties) {
     otlog_info << "event_name:" << event_name;
-    std::map<std::string, void*> user_info;
+    std::map<std::string, std::string> user_info;
 //    user_info["event_name"] = static_cast<void*>(event_name);
 //    user_info["event_properties"] = static_cast<void*>(event_properties);
-    https_client_.Get(path, [=](BASE_HTTPS::HTTPsClient* client, BASE_HTTPS::HTTPsClient::Status status, const std::string& body){
-        if (status != BASE_HTTPS::HTTPsClient::Status::kStatus200) {
-
-        }
+    https_client_.Post(path, user_info, [=](BASE_HTTPS::HTTPsClient* client, BASE_HTTPS::HTTPsClient::Status status, const std::string& body) {
+        
     });
 }
 

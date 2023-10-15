@@ -7,6 +7,7 @@
 #define otlog_xxx(xxx) BASE_LOG::Log(xxx, __FILE_NAME__, __LINE__, __FUNCTION__, true)
 #define otlog_info otlog_xxx(BASE_LOG::Log::Level::kInfo)
 #define otlog_fault otlog_xxx(BASE_LOG::Log::Level::kFault)
+#define otlog_error otlog_xxx(BASE_LOG::Log::Level::kError)
 
 BEGIN_NAMESPACE_BASE_LOG
 
