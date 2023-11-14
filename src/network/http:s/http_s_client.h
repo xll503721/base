@@ -36,7 +36,7 @@ public:
     using RequestCompletion = std::function<void (HTTPsClient* client, HTTPsClient::Status status, const std::string& body)>;
     
     void Get(const std::string& url_string, RequestCompletion requestCompletion);
-    void Post(const std::string& url_string, std::map<std::string, std::string> parmas, RequestCompletion requestCompletion);
+    void Post(const std::string& url_string, std::map<std::string, std::string> params, RequestCompletion requestCompletion);
     
 private:
     Configuration config_;

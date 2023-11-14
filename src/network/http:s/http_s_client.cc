@@ -59,7 +59,7 @@ void HTTPsClient::Get(const std::string& url_string, RequestCompletion requestCo
 //    });
 }
 
-void HTTPsClient::Post(const std::string& url_string, std::map<std::string, std::string> parmas, RequestCompletion requestCompletion) {
+void HTTPsClient::Post(const std::string& url_string, std::map<std::string, std::string> params, RequestCompletion requestCompletion) {
     otlog_info << "request url string:" << url_string.c_str();
     
     int32_t status = 200;
@@ -69,7 +69,7 @@ void HTTPsClient::Post(const std::string& url_string, std::map<std::string, std:
 //        httplib::Client cli(config_.host);
 //
 //        httplib::Params params;
-//        for (auto it = parmas.begin(); it != parmas.end(); it++) {
+//        for (auto it = params.begin(); it != params.end(); it++) {
 //            params.emplace(it->first, it->second);
 //        }
 //        

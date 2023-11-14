@@ -50,10 +50,10 @@ public:\
 
 /* invoke native method */
 #define PLATFORM_INVOKE(...) \
-std::string parmas_str = #__VA_ARGS__;\
+std::string params_str = #__VA_ARGS__;\
 std::string file(__FILE_NAME__);\
 std::string func(__PRETTY_FUNCTION__);\
-auto PLATFORM_INVOKE_RESULT = GetPlatform()->Perform(file, func, false, parmas_str, ##__VA_ARGS__, nullptr);\
+auto PLATFORM_INVOKE_RESULT = GetPlatform()->Perform(file, func, false, params_str, ##__VA_ARGS__, nullptr);\
 
 #define PLATFORM_SET_DELEGATE(delegate) \
 std::string delegate_file(__FILE_NAME__);\
