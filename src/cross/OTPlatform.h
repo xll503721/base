@@ -12,7 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol OTPlatformObjectDelegate <NSObject>
 
 @required
-@property (nonatomic, unsafe_unretained) void* cPlusPlusPrt;
+
+- (void)setCPlusPlusPrt:(std::shared_ptr<void>)cPlusPlusPrt;
 
 @end
 

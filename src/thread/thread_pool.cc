@@ -28,7 +28,7 @@ void ThreadPool::Init(int32_t thread_num, BASE_THREAD::Thread::Type type) {
     main_thread_ = std::make_shared<Thread>(Thread::Type::kMain);
     
     thread_num_ = thread_num;
-    otlog_info << "create:" << thread_num_ << " count thread";
+//    otlog_info << "create:" << thread_num_ << " count thread";
     for (int32_t i = 0; i < thread_num; i++) {
         std::shared_ptr<Thread> thread = std::make_shared<Thread>(std::bind(&ThreadPool::Execute, this), type);
         all_thread_vector_.push_back(thread);
@@ -38,31 +38,31 @@ void ThreadPool::Init(int32_t thread_num, BASE_THREAD::Thread::Type type) {
 
 void ThreadPool::Execute() {
     do {
-        otlog_info << "task queue size:" << task_queue_.size();
+//        otlog_info << "task queue size:" << task_queue_.size();
         std::unique_lock<std::mutex> lock(mutex_);
         cv_.wait(lock, [this] {
             return task_queue_.size() > 0;
         });
         
         auto task = task_queue_.front();
-        otlog_info << "type:" << static_cast<int32_t>(task.type);
+//        otlog_info << "type:" << static_cast<int32_t>(task.type);
         
         auto TaskExecute = [=]() {
-            otlog_info << "begin execute task func";
+//            otlog_info << "begin execute task func";
             task.func();
             task_queue_.pop();
-            otlog_info << "end execute task func";
+//            otlog_info << "end execute task func";
         };
         
         if (task.type == Thread::Type::kMain) {
-            otlog_info << "post task func to main";
+//            otlog_info << "post task func to main";
             main_thread_->Post([=]() {
-                otlog_info << "begin execute task func";
+//                otlog_info << "begin execute task func";
                 task.func();
-                otlog_info << "end execute task func";
+//                otlog_info << "end execute task func";
             });
             task_queue_.pop();
-            otlog_info << "end post task func to main";
+//            otlog_info << "end post task func to main";
             continue;
         }
         
@@ -76,7 +76,7 @@ void ThreadPool::TaskSchedule(Task task) {
         std::unique_lock<std::mutex> lock(mutex_);
         task_queue_.push(task);
     }
-    otlog_info << "notify all";
+//    otlog_info << "notify all";
     cv_.notify_all();
 }
 

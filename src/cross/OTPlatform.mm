@@ -84,7 +84,7 @@ static NSString *kOTOnetenSDKDelegate = @"ObjectDelegate";
             return;
         }
         
-        delegate.cPlusPlusPrt = c_plus_plus_obj.get();
+        [delegate setCPlusPlusPrt:c_plus_plus_obj];
     });
     
     BASE_PLATFORM::Platform::SetPerformMehtod([=] (const void* platform_obj,
@@ -143,6 +143,11 @@ static NSString *kOTOnetenSDKDelegate = @"ObjectDelegate";
     for (BASE_PLATFORM::Platform::Var* param: params) {
         auto type = param->GetType();
         switch (type) {
+            case BASE_PLATFORM::Platform::Var::Type::kTypeString: {
+                auto var = param->GetString();
+                [invocation setArgument:&var atIndex:argIndex];
+            }
+                break;
             case BASE_PLATFORM::Platform::Var::Type::kTypeInt: {
                 int32_t var = param->GetInt32();
                 [invocation setArgument:&var atIndex:argIndex];
@@ -166,6 +171,9 @@ static NSString *kOTOnetenSDKDelegate = @"ObjectDelegate";
                         case BASE_PLATFORM::Platform::Var::Type::kTypeInt:
                             ocValue = [NSNumber numberWithInt:value.GetInt32()];
                             break;
+                        case BASE_PLATFORM::Platform::Var::Type::kTypeString: {
+                            ocValue = [NSString stringWithUTF8String:value.GetString().c_str()];
+                        }
 
                         default:
                             break;
