@@ -10,6 +10,8 @@ BEGIN_NAMESPACE_BASE_STORAGE_DATABASE
 class DataBase {
     
 public:
+    static DataBase& DefaultInstance();
+    
     DataBase(const std::string& path);
     ~DataBase();
     
@@ -18,7 +20,7 @@ public:
     bool Insert(const std::string& table_name, BASE_PLATFORM::Platform::Var& row_var);
     bool Update(const std::string& table_name, BASE_PLATFORM::Platform::Var& row_var);
     bool Delete(const std::string& table_name, BASE_PLATFORM::Platform::Var& row_var);
-    bool Select(const std::string& table_name, BASE_PLATFORM::Platform::Var& row_var);
+    bool Select(const std::string& table_name, BASE_PLATFORM::Platform::Var& condition_var, BASE_PLATFORM::Platform::Var& row_var);
     
 private:
     bool Verify(BASE_PLATFORM::Platform::Var& row_var);

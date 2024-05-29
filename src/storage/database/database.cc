@@ -7,8 +7,15 @@
 
 #include "database.h"
 #include <string/string.h>
+#include <device/device.h>
 
 BEGIN_NAMESPACE_BASE_STORAGE_DATABASE
+
+DataBase& DataBase::DefaultInstance() {
+    static const std::string database_name = "sdk_db";
+    static DataBase data_base = BASE_STORAGE_DATABASE::DataBase(BASE_DEVICE::Device::DefaultInstance().GetFile()->GetCachesPath() + "/" + database_name);
+    return data_base;
+}
 
 DataBase::~DataBase() {
     if (db_) {
@@ -124,15 +131,15 @@ bool DataBase::Delete(const std::string& table_name, BASE_PLATFORM::Platform::Va
     }
 }
 
-bool DataBase::Select(const std::string& table_name, BASE_PLATFORM::Platform::Var& row_var) {
-    if (!Verify(row_var)) {
+bool DataBase::Select(const std::string& table_name, BASE_PLATFORM::Platform::Var& condition_var, BASE_PLATFORM::Platform::Var& row_var) {
+    if (!Verify(condition_var)) {
         return false;
     }
     
     std::ostringstream sql;
     sql << "SELECT ";
     
-    auto map = row_var.GetMap();
+    auto map = condition_var.GetMap();
     std::vector<std::string> fields;
     for (auto i = map->begin(); i != map->end(); i++) {
         auto field = i->first;
@@ -141,6 +148,9 @@ bool DataBase::Select(const std::string& table_name, BASE_PLATFORM::Platform::Va
     }
     
     auto fields_string = BASE_STRING::Join(fields, ", ");
+    if (fields_string == "") {
+        fields_string = "*";
+    }
     sql << fields_string << " FROM " << table_name;
     
     sqlite3_stmt* stmt;
